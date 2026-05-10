@@ -15,71 +15,79 @@
   --border:#252530;--b2:#323240;
   --text:#ededf5;--muted:#606080;--m2:#8888aa;
   --accent:#5b8af0;--ag:rgba(91,138,240,.2);
-  --green:#22c55e;--amber:#f59e0b;--red:#ef4444;
-  --gold:#eab308;
+  --green:#22c55e;--amber:#f59e0b;
   --nav-h:60px;--safe-b:env(safe-area-inset-bottom,0px);
 }
 html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}
+
 #map{position:fixed;inset:0;z-index:1;top:52px;bottom:calc(var(--nav-h) + var(--safe-b));}
 #map.add-mode{cursor:crosshair}
-#map.move-mode{cursor:move}
 
-/* ── TOP BAR ── */
 .topbar{
   position:fixed;top:0;left:0;right:0;height:52px;z-index:600;
   background:rgba(9,9,14,.88);border-bottom:1px solid var(--border);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  display:flex;align-items:center;padding:0 12px;gap:8px;
+  display:flex;align-items:center;padding:0 14px;gap:10px;
 }
-.tb-brand{font-size:13px;font-weight:600;flex:1;letter-spacing:-.2px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.tb-brand span{color:var(--muted);font-weight:400;font-size:11px}
+.tb-brand{font-size:14px;font-weight:600;flex:1;letter-spacing:-.2px}
+.tb-brand span{color:var(--muted);font-weight:400;font-size:12px}
 .tb-pill{
   display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:14px;
   background:var(--s2);border:1px solid var(--border);
-  font-size:11px;font-weight:500;color:var(--m2);white-space:nowrap;cursor:pointer;
+  font-size:11px;font-weight:500;color:var(--m2);
+  white-space:nowrap;
 }
-.tb-pill.admin{border-color:var(--gold);color:var(--gold)}
-.tb-pill.member{border-color:var(--green);color:var(--green)}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s;}
+.tb-dot{width:5px;height:5px;border-radius:50%}
+
+/* ── SYNC INDICATOR ── */
+.sync-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--muted);
+  flex-shrink:0;transition:background .3s;
+}
 .sync-dot.ok{background:var(--green)}
-.sync-dot.err{background:var(--red)}
+.sync-dot.err{background:#ef4444}
 .sync-dot.loading{background:var(--amber);animation:pulse .8s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-/* ── BOTTOM NAV ── */
 .botnav{
   position:fixed;bottom:0;left:0;right:0;z-index:600;
-  height:calc(var(--nav-h) + var(--safe-b));padding-bottom:var(--safe-b);
+  height:calc(var(--nav-h) + var(--safe-b));
+  padding-bottom:var(--safe-b);
   background:rgba(9,9,14,.94);border-top:1px solid var(--border);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   display:flex;align-items:stretch;
 }
 .bnitem{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:3px;cursor:pointer;background:transparent;border:none;color:var(--muted);
-  font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;transition:color .15s;padding:0;
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;cursor:pointer;
+  background:transparent;border:none;color:var(--muted);
+  font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;
+  transition:color .15s;padding:0;
 }
 .bnitem.on{color:var(--accent)}
 .bnitem svg{width:22px;height:22px;stroke-width:1.8}
-.bnitem-add{flex:1.4}
+.bnitem-add{flex:1.4;}
 .bnitem-add .add-circle{
-  width:46px;height:46px;border-radius:50%;background:var(--accent);
+  width:46px;height:46px;border-radius:50%;
+  background:var(--accent);
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 0 0 4px var(--ag),0 4px 20px rgba(91,138,240,.5);
   transition:all .15s;margin-bottom:1px;
 }
-.bnitem-add.on .add-circle{background:var(--red);box-shadow:0 0 0 4px rgba(239,68,68,.2),0 4px 20px rgba(239,68,68,.4)}
+.bnitem-add.on .add-circle{background:#ef4444;box-shadow:0 0 0 4px rgba(239,68,68,.2),0 4px 20px rgba(239,68,68,.4)}
 .bnitem-add .add-circle svg{width:24px;height:24px;stroke:#fff;stroke-width:2.2}
 
-/* ── SHEETS ── */
 .sheet{
   position:fixed;left:0;right:0;bottom:calc(var(--nav-h) + var(--safe-b));
-  z-index:500;background:var(--surface);border-radius:16px 16px 0 0;
-  border-top:1px solid var(--b2);box-shadow:0 -8px 40px rgba(0,0,0,.6);
-  transform:translateY(100%);transition:transform .28s cubic-bezier(.32,0,.2,1);
-  display:flex;flex-direction:column;max-height:82vh;overflow:hidden;
+  z-index:500;background:var(--surface);
+  border-radius:16px 16px 0 0;border-top:1px solid var(--b2);
+  box-shadow:0 -8px 40px rgba(0,0,0,.6);
+  transform:translateY(100%);
+  transition:transform .28s cubic-bezier(.32,0,.2,1);
+  display:flex;flex-direction:column;max-height:80vh;overflow:hidden;
 }
 .sheet.open{transform:translateY(0)}
+
 .sheet-handle{width:36px;height:4px;border-radius:2px;background:var(--b2);margin:10px auto 0;flex-shrink:0;}
 .sheet-title{
   padding:12px 18px 10px;font-size:15px;font-weight:600;
@@ -95,25 +103,33 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 .sheet-body{flex:1;overflow-y:auto;padding:12px 16px 16px;display:flex;flex-direction:column;gap:12px}
 .sheet-body::-webkit-scrollbar{display:none}
 
-/* ── FORMS ── */
+.sh-name{font-size:16px;font-weight:600}
+.sh-meta{font-size:12px;color:var(--muted)}
 .sh-sec{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.sh-name-input,.minput,.grp-sel,.note-ta,.amount-input{
-  width:100%;padding:11px 14px;border-radius:12px;font-size:14px;
-  background:var(--s2);border:1px solid var(--border);color:var(--text);
-  font-family:'DM Sans',sans-serif;
-}
-.note-ta{resize:none;min-height:60px}
-.amount-input{padding-left:28px}
-.amount-wrap{position:relative}
-.amount-wrap::before{content:'€';position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
-.sh-name-input:focus,.minput:focus,.grp-sel:focus,.note-ta:focus,.amount-input:focus{outline:none;border-color:var(--accent)}
-.grp-sel{-webkit-appearance:none;appearance:none}
 
 .st-row{display:flex;gap:8px}
 .st-btn{
-  flex:1;padding:11px 6px;border-radius:12px;font-size:12px;font-weight:600;
-  border:1.5px solid;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;text-align:center;
+  flex:1;padding:11px 6px;border-radius:12px;
+  font-size:12px;font-weight:600;border:1.5px solid;
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+  transition:all .15s;text-align:center;
 }
+
+.grp-sel{
+  width:100%;padding:12px 14px;border-radius:12px;font-size:14px;
+  background:var(--s2);border:1px solid var(--border);color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  -webkit-appearance:none;appearance:none;
+}
+.grp-sel:focus{outline:none;border-color:var(--accent)}
+
+.note-ta{
+  width:100%;padding:10px 12px;border-radius:12px;font-size:14px;
+  background:var(--s2);border:1px solid var(--border);color:var(--text);
+  font-family:'DM Sans',sans-serif;resize:none;min-height:70px;
+}
+.note-ta:focus{outline:none;border-color:var(--accent)}
+
 .sh-actions{display:flex;gap:8px}
 .sh-btn{
   flex:1;padding:13px;border-radius:12px;font-size:14px;font-weight:600;
@@ -121,17 +137,16 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
   font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;
 }
 .sh-btn-accent{background:var(--accent);border-color:var(--accent);color:#fff}
-.sh-btn-del{border-color:var(--red);color:var(--red);background:transparent}
-.sh-btn-gold{border-color:var(--gold);color:var(--gold);background:transparent}
+.sh-btn-del{border-color:#ef4444;color:#ef4444;background:transparent}
 
-/* ── LIST ── */
 .list-search{
   width:100%;padding:11px 14px;border-radius:12px;font-size:14px;
   background:var(--s2);border:1px solid var(--border);color:var(--text);
-  font-family:'DM Sans',sans-serif;
+  font-family:'DM Sans',sans-serif;flex-shrink:0;
 }
 .list-search:focus{outline:none;border-color:var(--accent)}
 .list-search::placeholder{color:var(--muted)}
+
 .hlist{display:flex;flex-direction:column;gap:4px}
 .hi{padding:12px 14px;border-radius:12px;background:var(--s2);border:1px solid transparent;cursor:pointer;}
 .hi.sel{border-color:var(--accent);background:rgba(91,138,240,.07)}
@@ -140,9 +155,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 .hi-label{font-size:14px;font-weight:500;flex:1}
 .hi-badge{font-size:11px;padding:2px 8px;border-radius:8px;font-weight:500}
 .hi-sub{font-size:11.5px;color:var(--muted);margin-top:3px;padding-left:17px}
-.hi-amount{font-size:11px;color:var(--green);font-weight:600}
 
-/* ── GROUPS ── */
 .gcard{border-radius:12px;border:1px solid var(--border);background:var(--s2);overflow:hidden;margin-bottom:6px}
 .gheader{padding:12px 14px;display:flex;align-items:center;gap:10px}
 .gcol{width:10px;height:10px;border-radius:50%;flex-shrink:0}
@@ -158,42 +171,39 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 .gmname{flex:1}
 .gmrm{width:26px;height:26px;border-radius:7px;background:transparent;border:1px solid var(--border);color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .gempty{padding:8px 14px 12px;font-size:12px;color:var(--muted);font-style:italic}
-.new-g-btn{padding:14px;border-radius:12px;width:100%;background:transparent;border:1.5px dashed var(--b2);color:var(--muted);font-size:14px;cursor:pointer;font-family:'DM Sans',sans-serif;}
 
-/* ── COLOR PICKER ── */
+.new-g-btn{
+  padding:14px;border-radius:12px;width:100%;
+  background:transparent;border:1.5px dashed var(--b2);
+  color:var(--muted);font-size:14px;cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+}
+
+.minput{width:100%;padding:12px 14px;border-radius:12px;font-size:14px;background:var(--s2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;}
+.minput:focus{outline:none;border-color:var(--accent)}
 .mlabel{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .cpicker{display:flex;gap:10px;flex-wrap:wrap;padding:4px 0}
 .cp{width:30px;height:30px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .15s}
 .cp.on{border-color:#fff;transform:scale(1.15)}
 
-/* ── ADMIN PANEL ── */
-.admin-section{background:rgba(234,179,8,.06);border:1px solid rgba(234,179,8,.2);border-radius:14px;padding:14px}
-.admin-section-title{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
-.edition-card{
-  padding:12px 14px;border-radius:12px;background:var(--s2);
-  border:1px solid var(--border);cursor:pointer;margin-bottom:6px;
-  display:flex;align-items:center;gap:10px;
+.add-hint{
+  position:fixed;top:64px;left:50%;transform:translateX(-50%);
+  background:var(--accent);color:#fff;
+  padding:8px 20px;border-radius:20px;
+  font-size:13px;font-weight:600;
+  z-index:700;box-shadow:0 4px 20px rgba(91,138,240,.5);
+  pointer-events:none;opacity:0;transition:opacity .2s;white-space:nowrap;
 }
-.edition-card.active{border-color:var(--accent);background:rgba(91,138,240,.07)}
-.edition-label{font-size:14px;font-weight:500;flex:1}
-.edition-badge{font-size:11px;padding:2px 8px;border-radius:8px}
-.edition-badge.active{background:rgba(91,138,240,.2);color:var(--accent)}
-.edition-badge.inactive{background:var(--s3);color:var(--muted)}
-.stat-row{display:flex;gap:8px;margin-bottom:10px}
-.stat-card{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
-.stat-num{font-size:22px;font-weight:600;color:var(--text)}
-.stat-lbl{font-size:10px;color:var(--muted);margin-top:2px}
-.stat-card.green .stat-num{color:var(--green)}
-.stat-card.gold .stat-num{color:var(--gold)}
+.add-hint.show{opacity:1}
 
-/* ── FILTER BAR ── */
 .filter-bar{
   position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 8px);left:12px;right:12px;
   z-index:400;display:flex;gap:6px;overflow-x:auto;padding:2px 0;scrollbar-width:none;
 }
 .filter-bar::-webkit-scrollbar{display:none}
 .fpill{
-  flex-shrink:0;display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:14px;
+  flex-shrink:0;display:flex;align-items:center;gap:5px;
+  padding:6px 12px;border-radius:14px;
   background:rgba(9,9,14,.85);border:1px solid var(--border);
   font-size:11.5px;font-weight:500;color:var(--m2);cursor:pointer;
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);white-space:nowrap;
@@ -201,17 +211,10 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 .fpill.on{border-color:var(--accent);background:rgba(9,9,14,.95);color:var(--accent)}
 .fdot{width:6px;height:6px;border-radius:50%}
 
-/* ── HINTS ── */
-.add-hint{
-  position:fixed;top:64px;left:50%;transform:translateX(-50%);
-  background:var(--accent);color:#fff;padding:8px 20px;border-radius:20px;
-  font-size:13px;font-weight:600;z-index:700;box-shadow:0 4px 20px rgba(91,138,240,.5);
-  pointer-events:none;opacity:0;transition:opacity .2s;white-space:nowrap;
-}
-.add-hint.show{opacity:1}
-.move-hint{background:#8b5cf6}
+.empty-st{padding:32px 16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.6}
+.empty-st .ei{font-size:32px;display:block;margin-bottom:8px}
 
-/* ── TOAST ── */
+/* Toast notification */
 .toast{
   position:fixed;top:64px;left:50%;transform:translateX(-50%) translateY(-80px);
   background:var(--s3);border:1px solid var(--b2);color:var(--text);
@@ -221,43 +224,14 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 }
 .toast.show{transform:translateX(-50%) translateY(0)}
 
-/* ── LOGIN OVERLAY ── */
-.login-overlay{
-  position:fixed;inset:0;z-index:1000;background:var(--bg);
-  display:flex;align-items:center;justify-content:center;padding:24px;
+/* Rename input in house sheet */
+.sh-name-input{
+  width:100%;padding:8px 12px;border-radius:10px;font-size:15px;font-weight:600;
+  background:var(--s2);border:1px solid var(--b2);color:var(--text);
+  font-family:'DM Sans',sans-serif;
 }
-.login-box{
-  width:100%;max-width:340px;background:var(--surface);
-  border:1px solid var(--b2);border-radius:20px;padding:28px 24px;
-}
-.login-title{font-size:18px;font-weight:600;margin-bottom:4px}
-.login-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
-.login-tabs{display:flex;gap:6px;margin-bottom:18px}
-.login-tab{
-  flex:1;padding:9px;border-radius:10px;border:1px solid var(--border);
-  background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;
-  font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;
-}
-.login-tab.on{background:var(--s2);border-color:var(--b2);color:var(--text)}
-.login-tab.admin.on{border-color:var(--gold);color:var(--gold)}
-.login-tab.member.on{border-color:var(--green);color:var(--green)}
-.login-input{
-  width:100%;padding:13px 14px;border-radius:12px;font-size:15px;
-  background:var(--s2);border:1px solid var(--border);color:var(--text);
-  font-family:'DM Sans',sans-serif;margin-bottom:12px;
-}
-.login-input:focus{outline:none;border-color:var(--accent)}
-.login-btn{
-  width:100%;padding:13px;border-radius:12px;font-size:15px;font-weight:600;
-  border:none;background:var(--accent);color:#fff;
-  font-family:'DM Sans',sans-serif;cursor:pointer;transition:opacity .15s;
-}
-.login-btn:active{opacity:.8}
-.login-err{font-size:12px;color:var(--red);text-align:center;min-height:18px;margin-top:8px}
+.sh-name-input:focus{outline:none;border-color:var(--accent)}
 
-/* ── MISC ── */
-.empty-st{padding:32px 16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.6}
-.empty-st .ei{font-size:32px;display:block;margin-bottom:8px}
 .leaflet-control-zoom{margin:10px 10px 0 0!important}
 .leaflet-control-zoom a{width:36px!important;height:36px!important;line-height:36px!important;font-size:18px!important;background:rgba(9,9,14,.85)!important;color:var(--text)!important;border-color:var(--border)!important;}
 .leaflet-control-attribution{font-size:8px!important;background:rgba(9,9,14,.6)!important;color:var(--muted)!important}
@@ -267,30 +241,12 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 </head>
 <body>
 
-<!-- LOGIN OVERLAY -->
-<div class="login-overlay" id="loginOverlay">
-  <div class="login-box">
-    <div class="login-title">🏡 Collecte Village</div>
-    <div class="login-sub">St-Martin-d'Arrossa · Comité des fêtes</div>
-    <div class="login-tabs">
-      <button class="login-tab member on" id="tab-member" onclick="switchTab('member')">Membre</button>
-      <button class="login-tab admin" id="tab-admin" onclick="switchTab('admin')">Admin ⚙️</button>
-    </div>
-    <input class="login-input" type="password" id="loginPwd" placeholder="Mot de passe…" onkeydown="if(event.key==='Enter')doLogin()"/>
-    <button class="login-btn" onclick="doLogin()">Accéder</button>
-    <div class="login-err" id="loginErr"></div>
-  </div>
-</div>
-
 <!-- TOP BAR -->
 <div class="topbar">
-  <div class="tb-brand" id="tbBrand">St-Martin-d'Arrossa <span id="editionLabel">· Collecte</span></div>
-  <div id="tbPill" class="tb-pill" onclick="openSheet('admin')" style="display:none">
+  <div class="tb-brand">St-Martin-d'Arrossa <span>· Collecte</span></div>
+  <div id="tbPill" class="tb-pill">
     <div class="sync-dot loading" id="syncDot"></div>
-    <span id="tbCount">…</span>
-  </div>
-  <div id="roleBadge" class="tb-pill" style="display:none" onclick="logout()">
-    <span id="roleLabel">–</span>
+    <span id="tbCount">Connexion…</span>
   </div>
 </div>
 
@@ -307,7 +263,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 <div class="toast" id="toast"></div>
 
 <!-- BOTTOM NAV -->
-<nav class="botnav" id="botnav" style="display:none">
+<nav class="botnav">
   <button class="bnitem" id="bn-list" onclick="openSheet('list')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>
     Maisons
@@ -322,37 +278,37 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
     </div>
     <span id="addLabel">Ajouter</span>
   </button>
-  <button class="bnitem" onclick="geolocate()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
-    Position
-  </button>
-  <button class="bnitem" id="bn-admin" onclick="openSheet('admin')" style="display:none">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-    Admin
-  </button>
 </nav>
 
 <!-- HOUSE DETAIL SHEET -->
 <div class="sheet" id="sheet-house">
   <div class="sheet-handle"></div>
-  <div class="sheet-title"><span id="sh-name">—</span><div class="sheet-close" onclick="closeSheet('house')">✕</div></div>
+  <div class="sheet-title">
+    <span id="sh-name">—</span>
+    <div class="sheet-close" onclick="closeSheet('house')">✕</div>
+  </div>
   <div class="sheet-body">
-    <div><div class="sh-sec">Nom</div><input class="sh-name-input" id="sh-name-edit" placeholder="Nom de la maison…"/></div>
-    <div id="sh-meta" style="font-size:12px;color:var(--muted);margin-top:-4px"></div>
-    <div><div class="sh-sec">Statut</div><div class="st-row" id="sh-status"></div></div>
     <div>
-      <div class="sh-sec">Don reçu</div>
-      <div class="amount-wrap"><input class="amount-input" id="sh-amount" type="number" min="0" step="1" placeholder="0"/></div>
+      <div class="sh-sec">Nom</div>
+      <input class="sh-name-input" id="sh-name-edit" placeholder="Nom de la maison…"/>
     </div>
-    <div><div class="sh-sec">Groupe</div><select class="grp-sel" id="sh-group" onchange="assignGroup()"></select></div>
-    <div><div class="sh-sec">Note</div><textarea class="note-ta" id="sh-note" rows="2" placeholder="Ajouter une note…"></textarea></div>
+    <div id="sh-meta" style="font-size:12px;color:var(--muted);margin-top:-4px"></div>
+    <div>
+      <div class="sh-sec">Statut</div>
+      <div class="st-row" id="sh-status"></div>
+    </div>
+    <div>
+      <div class="sh-sec">Groupe</div>
+      <select class="grp-sel" id="sh-group" onchange="assignGroup()"></select>
+    </div>
+    <div>
+      <div class="sh-sec">Note</div>
+      <textarea class="note-ta" id="sh-note" rows="3" placeholder="Ajouter une note…"></textarea>
+    </div>
     <div class="sh-actions">
       <button class="sh-btn sh-btn-accent" onclick="saveHouse()">Sauvegarder</button>
       <button class="sh-btn" onclick="closeSheet('house')">Fermer</button>
-      <button id="sh-del-btn" class="sh-btn sh-btn-del" onclick="deleteSel()" style="flex:.6">🗑</button>
-    </div>
-    <div id="sh-move-wrap" style="display:none">
-      <button class="sh-btn sh-btn-gold" onclick="startMoveMode()" style="width:100%">📍 Déplacer le marqueur</button>
+      <button class="sh-btn sh-btn-del" onclick="deleteSel()" style="flex:.6">🗑</button>
     </div>
   </div>
 </div>
@@ -360,7 +316,10 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 <!-- LIST SHEET -->
 <div class="sheet" id="sheet-list">
   <div class="sheet-handle"></div>
-  <div class="sheet-title"><span>Maisons</span><div class="sheet-close" onclick="closeSheet('list')">✕</div></div>
+  <div class="sheet-title">
+    <span>Maisons</span>
+    <div class="sheet-close" onclick="closeSheet('list')">✕</div>
+  </div>
   <div class="sheet-body">
     <input class="list-search" id="search" placeholder="Rechercher…" oninput="renderList()"/>
     <div class="hlist" id="hlist"></div>
@@ -370,7 +329,10 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 <!-- GROUPS SHEET -->
 <div class="sheet" id="sheet-groups">
   <div class="sheet-handle"></div>
-  <div class="sheet-title"><span>Groupes</span><div class="sheet-close" onclick="closeSheet('groups')">✕</div></div>
+  <div class="sheet-title">
+    <span>Groupes</span>
+    <div class="sheet-close" onclick="closeSheet('groups')">✕</div>
+  </div>
   <div class="sheet-body">
     <div id="glist"></div>
     <button class="new-g-btn" onclick="openSheet('addgroup')">＋ Créer un groupe</button>
@@ -380,10 +342,19 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 <!-- ADD GROUP SHEET -->
 <div class="sheet" id="sheet-addgroup">
   <div class="sheet-handle"></div>
-  <div class="sheet-title"><span>Nouveau groupe</span><div class="sheet-close" onclick="closeSheet('addgroup')">✕</div></div>
+  <div class="sheet-title">
+    <span>Nouveau groupe</span>
+    <div class="sheet-close" onclick="closeSheet('addgroup')">✕</div>
+  </div>
   <div class="sheet-body">
-    <div><div class="mlabel">Nom</div><input class="minput" id="gName" placeholder="ex : Rue principale…"/></div>
-    <div><div class="mlabel">Couleur</div><div class="cpicker" id="cpicker"></div></div>
+    <div>
+      <div class="mlabel">Nom</div>
+      <input class="minput" id="gName" placeholder="ex : Rue principale…"/>
+    </div>
+    <div>
+      <div class="mlabel">Couleur</div>
+      <div class="cpicker" id="cpicker"></div>
+    </div>
     <div class="sh-actions">
       <button class="sh-btn sh-btn-accent" onclick="confirmAddGroup()">Créer</button>
       <button class="sh-btn" onclick="closeSheet('addgroup')">Annuler</button>
@@ -391,77 +362,23 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
   </div>
 </div>
 
-<!-- ADMIN SHEET -->
-<div class="sheet" id="sheet-admin">
-  <div class="sheet-handle"></div>
-  <div class="sheet-title">
-    <span>⚙️ Administration</span>
-    <div class="sheet-close" onclick="closeSheet('admin')">✕</div>
-  </div>
-  <div class="sheet-body">
-
-    <!-- Stats globales -->
-    <div class="admin-section">
-      <div class="admin-section-title">📊 Résumé de la collecte</div>
-      <div class="stat-row">
-        <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-lbl">Maisons</div></div>
-        <div class="stat-card green"><div class="stat-num" id="stat-visited">0</div><div class="stat-lbl">Visitées</div></div>
-        <div class="stat-card gold"><div class="stat-num" id="stat-amount">0 €</div><div class="stat-lbl">Collectés</div></div>
-      </div>
-    </div>
-
-    <!-- Éditions -->
-    <div class="admin-section">
-      <div class="admin-section-title">🗓 Éditions / Années</div>
-      <div id="edition-list"></div>
-      <button class="new-g-btn" onclick="openSheet('addedition')" style="margin-top:6px">＋ Nouvelle édition</button>
-    </div>
-
-    <!-- Export -->
-    <div class="admin-section">
-      <div class="admin-section-title">📋 Export</div>
-      <button class="sh-btn" onclick="exportCSV()" style="width:100%">⬇ Télécharger CSV</button>
-    </div>
-
-    <!-- Déplacer marqueurs -->
-    <div class="admin-section">
-      <div class="admin-section-title">📍 Carte</div>
-      <button class="sh-btn" onclick="closeSheet('admin');showToast('Ouvrez une maison puis appuyez sur Déplacer le marqueur');" style="width:100%">Mode déplacement des marqueurs</button>
-    </div>
-
-  </div>
-</div>
-
-<!-- ADD EDITION SHEET -->
-<div class="sheet" id="sheet-addedition">
-  <div class="sheet-handle"></div>
-  <div class="sheet-title"><span>Nouvelle édition</span><div class="sheet-close" onclick="closeSheet('addedition')">✕</div></div>
-  <div class="sheet-body">
-    <div><div class="mlabel">Année</div><input class="minput" id="eName" type="number" placeholder="ex : 2027" min="2020" max="2099"/></div>
-    <div><div class="mlabel">Label</div><input class="minput" id="eLabel" placeholder="ex : Fête 2027"/></div>
-    <div class="sh-actions">
-      <button class="sh-btn sh-btn-accent" onclick="confirmAddEdition()">Créer</button>
-      <button class="sh-btn" onclick="closeSheet('addedition')">Annuler</button>
-    </div>
-  </div>
-</div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<!-- Supabase SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- bcryptjs for password hashing -->
-<script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
 
 <script>
 // ═══════════════════════════════════════
-// ⚙️  CONFIGURATION — À MODIFIER
+// ⚙️  CONFIGURATION SUPABASE
+// Remplace ces deux valeurs par les tiennes :
+// Supabase > Settings > API
 // ═══════════════════════════════════════
-const SUPABASE_URL = 'REMPLACE_PAR_TON_URL_SUPABASE';
-const SUPABASE_KEY = 'REMPLACE_PAR_TA_CLE_ANON_SUPABASE';
+const SUPABASE_URL = 'https://ljetbkjztjehrebhhbsc.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqZXRia2p6dGplaHJlYmhoYnNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNDI1NDUsImV4cCI6MjA5MzgxODU0NX0.Km-EodOaOIC8BjUJbkwsWfGPoazCzVSjzE1fbNOHsBk';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ═══════════════════════════════════════
-// ÉTAT
+// CONFIG STATUTS
 // ═══════════════════════════════════════
 const ST = {
   à_visiter:{label:'À visiter', color:'#5b8af0'},
@@ -470,165 +387,104 @@ const ST = {
 };
 const GC = ['#5b8af0','#f472b6','#fb923c','#a78bfa','#34d399','#fbbf24','#60a5fa','#f87171','#e879f9','#4ade80'];
 
-let groups=[], houses=[], editions=[];
-let currentEditionId = null;
-let selId=null, markers={}, addMode=false, moveMode=false, fStatus=null, selColor=GC[0], activeSheet=null;
-let userRole = null; // 'admin' | 'member' | null
+let groups = [];
+let houses = [];
+let selId  = null, markers = {}, addMode = false, fStatus = null, selColor = GC[0];
+let activeSheet = null;
+let saving = false;
 
 // ═══════════════════════════════════════
-// LOGIN
-// ═══════════════════════════════════════
-let loginTab = 'member';
-function switchTab(t){
-  loginTab = t;
-  document.getElementById('tab-member').className = 'login-tab member'+(t==='member'?' on':'');
-  document.getElementById('tab-admin').className  = 'login-tab admin'+(t==='admin'?' on':'');
-  document.getElementById('loginPwd').value='';
-  document.getElementById('loginErr').textContent='';
-}
-
-async function doLogin(){
-  const pwd = document.getElementById('loginPwd').value;
-  if(!pwd){document.getElementById('loginErr').textContent='Entrez un mot de passe.';return;}
-  document.getElementById('loginErr').textContent='';
-  try {
-    const {data, error} = await sb.from('app_roles').select('pwd_hash').eq('role', loginTab).single();
-    if(error||!data) throw new Error();
-    const ok = await bcrypt.compare(pwd, data.pwd_hash);
-    if(!ok){document.getElementById('loginErr').textContent='Mot de passe incorrect.';return;}
-    userRole = loginTab;
-    document.getElementById('loginOverlay').style.display='none';
-    document.getElementById('botnav').style.display='flex';
-    document.getElementById('tbPill').style.display='flex';
-    document.getElementById('roleBadge').style.display='flex';
-    const rb = document.getElementById('roleBadge');
-    rb.className = 'tb-pill '+(userRole==='admin'?'admin':'member');
-    document.getElementById('roleLabel').textContent = userRole==='admin'?'⚙️ Admin':'👤 Membre';
-    if(userRole==='admin') document.getElementById('bn-admin').style.display='flex';
-    await init();
-  } catch(e) {
-    document.getElementById('loginErr').textContent='Erreur de connexion.';
-  }
-}
-
-function logout(){
-  if(!confirm('Se déconnecter ?')) return;
-  userRole=null; selId=null; houses=[]; groups=[]; editions=[]; currentEditionId=null;
-  Object.values(markers).forEach(m=>map.removeLayer(m)); markers={};
-  document.getElementById('loginOverlay').style.display='flex';
-  document.getElementById('botnav').style.display='none';
-  document.getElementById('tbPill').style.display='none';
-  document.getElementById('roleBadge').style.display='none';
-  document.getElementById('loginPwd').value='';
-  switchTab('member');
-}
-
-// ═══════════════════════════════════════
-// TOAST / SYNC
+// TOAST
 // ═══════════════════════════════════════
 let toastTimer;
-function showToast(msg,d=2400){
-  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
-  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),d);
+function showToast(msg, duration=2200){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'), duration);
 }
-function setSyncState(s){document.getElementById('syncDot').className='sync-dot '+s;}
+
+// ═══════════════════════════════════════
+// SYNC DOT
+// ═══════════════════════════════════════
+function setSyncState(state){ // 'loading' | 'ok' | 'err'
+  const d=document.getElementById('syncDot');
+  d.className='sync-dot '+state;
+}
 
 // ═══════════════════════════════════════
 // MAP
 // ═══════════════════════════════════════
-const map = L.map('map',{center:[43.2388,-1.3128],zoom:17,zoomControl:true,tap:true});
-L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:20}).addTo(map);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',{attribution:'© CartoDB',maxZoom:20,opacity:.65}).addTo(map);
+const map = L.map('map', {center:[43.2388,-1.3128], zoom:17, zoomControl:true, tap:true});
+
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
+  attribution:'© Esri', maxZoom:20
+}).addTo(map);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',{
+  attribution:'© CartoDB', maxZoom:20, opacity:.65
+}).addTo(map);
 
 map.on('click', async e => {
-  if(!addMode) return;
-  const id=Date.now();
-  const h={id,edition_id:currentEditionId,name:`Maison ${houses.length+1}`,lat:e.latlng.lat,lng:e.latlng.lng,status:'à_visiter',note:'',amount:0,group_id:null};
-  houses.push(h);addM(h);flashM(id);renderList();renderGroups();updateFilter();
+  if (!addMode) return;
+  const id = Date.now(); // ID numérique unique
+  const h = {id, name:`Maison ${houses.length+1}`, lat:e.latlng.lat, lng:e.latlng.lng,
+              status:'à_visiter', note:'', group_id:null};
+  // Optimistic UI
+  houses.push(h);
+  addM(h); flashM(id);
+  renderList(); renderGroups(); updateFilter();
+  // Persist
   await dbInsertHouse(h);
 });
-map.on('click', ()=>{ if(!addMode&&!moveMode&&activeSheet&&activeSheet!=='house') closeSheet(activeSheet); });
-document.addEventListener('keydown', e=>{ if(e.key==='Escape'){if(addMode)toggleAddMode();if(moveMode)cancelMoveMode();} });
+
+map.on('click', () => { if (!addMode && activeSheet && activeSheet !== 'house') closeSheet(activeSheet); });
+document.addEventListener('keydown', e => { if(e.key==='Escape' && addMode) toggleAddMode(); });
 
 // ═══════════════════════════════════════
-// GEOLOCATE
+// ADD MODE
 // ═══════════════════════════════════════
-function geolocate(){
-  if(!navigator.geolocation){showToast('Géolocalisation non disponible');return;}
-  navigator.geolocation.getCurrentPosition(
-    p=>{ map.setView([p.coords.latitude,p.coords.longitude],17,{animate:true}); showToast('📍 Position trouvée'); },
-    ()=>{ showToast('⚠️ Impossible de localiser'); }
-  );
-}
-
-// ═══════════════════════════════════════
-// ADD / MOVE MODES
-// ═══════════════════════════════════════
-function toggleAddMode(){
-  addMode=!addMode;
-  const btn=document.getElementById('bn-add'),hint=document.getElementById('addHint');
-  const mapEl=document.getElementById('map'),icon=document.getElementById('addIcon'),lbl=document.getElementById('addLabel');
-  if(addMode){
-    btn.classList.add('on');hint.classList.add('show');hint.classList.remove('move-hint');mapEl.classList.add('add-mode');
+function toggleAddMode() {
+  addMode = !addMode;
+  const btn=document.getElementById('bn-add'), hint=document.getElementById('addHint');
+  const mapEl=document.getElementById('map'), icon=document.getElementById('addIcon'), lbl=document.getElementById('addLabel');
+  if (addMode) {
+    btn.classList.add('on'); hint.classList.add('show'); mapEl.classList.add('add-mode');
     icon.innerHTML='<line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/>';
-    lbl.textContent='Quitter';closeSheet(activeSheet);
+    lbl.textContent='Quitter'; closeSheet(activeSheet);
   } else {
-    btn.classList.remove('on');hint.classList.remove('show');mapEl.classList.remove('add-mode');
+    btn.classList.remove('on'); hint.classList.remove('show'); mapEl.classList.remove('add-mode');
     icon.innerHTML='<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>';
     lbl.textContent='Ajouter';
   }
 }
 
-let movingId = null;
-function startMoveMode(){
-  if(userRole!=='admin'){showToast('Réservé à l\'admin');return;}
-  movingId=selId;moveMode=true;
-  closeSheet('house');
-  const hint=document.getElementById('addHint');
-  hint.textContent='📍 Tapez le nouvel emplacement';hint.classList.add('show','move-hint');
-  document.getElementById('map').classList.add('move-mode');
-  map.once('click', async e=>{
-    const h=houses.find(x=>x.id===movingId);
-    if(h){
-      h.lat=e.latlng.lat;h.lng=e.latlng.lng;
-      if(markers[movingId]){markers[movingId].setLatLng([h.lat,h.lng]);}
-      await dbUpdateHouse(h);showToast('✓ Marqueur déplacé');
-    }
-    cancelMoveMode();
-  });
-}
-function cancelMoveMode(){
-  moveMode=false;movingId=null;
-  const hint=document.getElementById('addHint');
-  hint.classList.remove('show','move-hint');hint.textContent='📍 Tapez sur la carte pour placer';
-  document.getElementById('map').classList.remove('move-mode');
-}
-
-function flashM(id){
-  if(!markers[id])return;const el=markers[id].getElement();if(!el)return;
-  const inner=el.querySelector('div');if(!inner)return;
-  inner.style.transition='transform .12s';inner.style.transform='scale(1.7)';
-  setTimeout(()=>{inner.style.transform='scale(1)';},150);
+function flashM(id) {
+  if (!markers[id]) return;
+  const el=markers[id].getElement(); if (!el) return;
+  const inner=el.querySelector('div'); if (!inner) return;
+  inner.style.transition='transform .12s'; inner.style.transform='scale(1.7)';
+  setTimeout(()=>{ inner.style.transform='scale(1)'; }, 150);
 }
 
 // ═══════════════════════════════════════
 // SHEETS
 // ═══════════════════════════════════════
-const SHEETS=['house','list','groups','addgroup','admin','addedition'];
-function openSheet(name){
-  SHEETS.forEach(s=>{if(s!==name)document.getElementById('sheet-'+s).classList.remove('open');});
-  document.getElementById('sheet-'+name).classList.add('open');activeSheet=name;
-  document.getElementById('bn-list').classList.toggle('on',name==='list');
-  document.getElementById('bn-groups').classList.toggle('on',name==='groups');
-  if(name==='list')renderList();
-  if(name==='groups')renderGroups();
-  if(name==='admin')renderAdmin();
+const SHEETS = ['house','list','groups','addgroup'];
+function openSheet(name) {
+  SHEETS.forEach(s => { if(s!==name) document.getElementById('sheet-'+s).classList.remove('open'); });
+  document.getElementById('sheet-'+name).classList.add('open');
+  activeSheet = name;
+  document.getElementById('bn-list').classList.toggle('on', name==='list');
+  document.getElementById('bn-groups').classList.toggle('on', name==='groups');
+  if(name==='list')   renderList();
+  if(name==='groups') renderGroups();
 }
-function closeSheet(name){
-  if(!name)return;
+function closeSheet(name) {
+  if (!name) return;
   document.getElementById('sheet-'+name).classList.remove('open');
-  if(activeSheet===name)activeSheet=null;
-  if(name==='house'){const p=selId;selId=null;if(p)refreshM(p);renderList();}
+  if(activeSheet===name) activeSheet=null;
+  if(name==='house'){ const p=selId; selId=null; if(p)refreshM(p); renderList(); }
   document.getElementById('bn-list').classList.remove('on');
   document.getElementById('bn-groups').classList.remove('on');
 }
@@ -638,7 +494,7 @@ function closeSheet(name){
 // ═══════════════════════════════════════
 function gc(h){const g=groups.find(x=>x.id===h.group_id);return g?g.color:ST[h.status]?.color||'#5b8af0';}
 function mkIcon(h){
-  const s=h.id===selId,c=gc(h),sc=ST[h.status]?.color||'#5b8af0',sz=s?40:28;
+  const s=h.id===selId, c=gc(h), sc=ST[h.status]?.color||'#5b8af0', sz=s?40:28;
   return L.divIcon({
     html:`<div style="width:${sz}px;height:${sz}px;border-radius:50%;
       background:${c}18;border:${s?3:2}px solid ${c};
@@ -648,15 +504,15 @@ function mkIcon(h){
       <div style="width:${sz*.38}px;height:${sz*.38}px;border-radius:50%;background:${sc}"></div>
       ${s?`<div style="position:absolute;inset:-6px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3)"></div>`:''}
     </div>`,
-    className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]
+    className:'', iconSize:[sz,sz], iconAnchor:[sz/2,sz/2]
   });
 }
 function addM(h){
   const m=L.marker([h.lat,h.lng],{icon:mkIcon(h)}).addTo(map);
   m.bindTooltip(h.name,{permanent:false,direction:'top',offset:[0,-14]});
-  m.on('click',e=>{
-    if(addMode||moveMode){L.DomEvent.stopPropagation(e);return;}
-    L.DomEvent.stopPropagation(e);sel(h.id);
+  m.on('click', e=>{
+    if(addMode){L.DomEvent.stopPropagation(e);return;}
+    L.DomEvent.stopPropagation(e); sel(h.id);
   });
   markers[h.id]=m;
 }
@@ -667,32 +523,30 @@ function removeM(id){if(markers[id]){map.removeLayer(markers[id]);delete markers
 // SELECT
 // ═══════════════════════════════════════
 function sel(id){
-  const p=selId;selId=id;if(p)refreshM(p);refreshM(id);renderList();openHouseSheet(id);
-  const h=houses.find(x=>x.id===id);if(h)map.panTo([h.lat,h.lng],{animate:true,duration:.3});
+  const p=selId; selId=id;
+  if(p) refreshM(p);
+  refreshM(id);
+  renderList();
+  openHouseSheet(id);
+  const h=houses.find(x=>x.id===id);
+  if(h) map.panTo([h.lat,h.lng],{animate:true,duration:.3});
 }
 
 function openHouseSheet(id){
-  const h=houses.find(x=>x.id===id);if(!h)return;
+  const h=houses.find(x=>x.id===id); if(!h) return;
   const g=groups.find(x=>x.id===h.group_id);
-  document.getElementById('sh-name').textContent=h.name;
-  document.getElementById('sh-name-edit').value=h.name;
-  document.getElementById('sh-meta').textContent=g?`Groupe : ${g.name}`:'Aucun groupe';
-  document.getElementById('sh-note').value=h.note||'';
-  document.getElementById('sh-amount').value=h.amount||0;
+  document.getElementById('sh-name').textContent = h.name;
+  document.getElementById('sh-name-edit').value  = h.name;
+  document.getElementById('sh-meta').textContent = g?`Groupe : ${g.name}`:'Aucun groupe';
+  document.getElementById('sh-note').value       = h.note||'';
 
-  document.getElementById('sh-status').innerHTML=Object.entries(ST).map(([k,cfg])=>`
+  document.getElementById('sh-status').innerHTML = Object.entries(ST).map(([k,cfg])=>`
     <button class="st-btn" style="border-color:${cfg.color};color:${h.status===k?'#09090e':cfg.color};background:${h.status===k?cfg.color:'transparent'}"
       onclick="setSt(${id},'${k}')">${cfg.label}</button>`).join('');
 
-  document.getElementById('sh-group').innerHTML=
+  document.getElementById('sh-group').innerHTML =
     `<option value="">— Aucun groupe —</option>`+
     groups.map(g=>`<option value="${g.id}"${h.group_id===g.id?' selected':''}>${g.name}</option>`).join('');
-
-  // Admin-only elements
-  const delBtn=document.getElementById('sh-del-btn');
-  const moveWrap=document.getElementById('sh-move-wrap');
-  if(userRole==='admin'){delBtn.style.display='';moveWrap.style.display='';}
-  else{delBtn.style.display='none';moveWrap.style.display='none';}
 
   openSheet('house');
 }
@@ -704,30 +558,34 @@ function setSt(id,s){
 
 async function saveHouse(){
   if(!selId)return;
-  const h=houses.find(x=>x.id===selId);if(!h)return;
+  const h=houses.find(x=>x.id===selId); if(!h)return;
   h.name=document.getElementById('sh-name-edit').value.trim()||h.name;
   h.note=document.getElementById('sh-note').value;
-  h.amount=parseFloat(document.getElementById('sh-amount').value)||0;
   h.group_id=document.getElementById('sh-group').value||null;
   document.getElementById('sh-name').textContent=h.name;
-  refreshM(selId);renderList();renderGroups();
-  await dbUpdateHouse(h);showToast('✓ Sauvegardé');
+  refreshM(selId); renderList(); renderGroups();
+  await dbUpdateHouse(h);
+  showToast('✓ Sauvegardé');
 }
 
 function assignGroup(){
-  if(!selId)return;const h=houses.find(x=>x.id===selId);if(!h)return;
+  if(!selId)return;
+  const h=houses.find(x=>x.id===selId); if(!h)return;
   h.group_id=document.getElementById('sh-group').value||null;
   const g=groups.find(x=>x.id===h.group_id);
   document.getElementById('sh-meta').textContent=g?`Groupe : ${g.name}`:'Aucun groupe';
-  refreshM(selId);renderList();renderGroups();
+  refreshM(selId); renderList(); renderGroups();
 }
 
 async function deleteSel(){
-  if(userRole!=='admin'){showToast('Réservé à l\'admin');return;}
   if(!selId||!confirm('Supprimer cette maison ?'))return;
-  const id=selId;removeM(id);houses=houses.filter(x=>x.id!==id);
-  selId=null;closeSheet('house');renderList();renderGroups();updateFilter();
-  await sb.from('houses').delete().eq('id',id);
+  const id=selId;
+  removeM(id);
+  houses=houses.filter(x=>x.id!==id);
+  selId=null;
+  closeSheet('house');
+  renderList();renderGroups();updateFilter();
+  await sb.from('houses').delete().eq('id', id);
 }
 
 // ═══════════════════════════════════════
@@ -736,16 +594,21 @@ async function deleteSel(){
 function updateFilter(){
   const c={};Object.keys(ST).forEach(k=>c[k]=houses.filter(h=>h.status===k).length);
   document.getElementById('filterBar').innerHTML=
-    `<div class="fpill${!fStatus?' on':''}" onclick="setF(null)"><div class="fdot" style="background:var(--accent)"></div>Tous ${houses.length}</div>`+
+    `<div class="fpill${!fStatus?' on':''}" onclick="setF(null)">
+      <div class="fdot" style="background:var(--accent)"></div>Tous ${houses.length}</div>`+
     Object.entries(ST).map(([k,cfg])=>
-      `<div class="fpill${fStatus===k?' on':''}" onclick="setF('${k}')"><div class="fdot" style="background:${cfg.color}"></div>${cfg.label} ${c[k]}</div>`
+      `<div class="fpill${fStatus===k?' on':''}" onclick="setF('${k}')">
+        <div class="fdot" style="background:${cfg.color}"></div>${cfg.label} ${c[k]}</div>`
     ).join('');
   document.getElementById('tbCount').textContent=`${houses.length} maison${houses.length!==1?'s':''}`;
 }
 
 function setF(s){
   fStatus=s;updateFilter();renderList();
-  houses.forEach(h=>{if(!markers[h.id])return;(!s||h.status===s)?map.addLayer(markers[h.id]):map.removeLayer(markers[h.id]);});
+  houses.forEach(h=>{
+    if(!markers[h.id])return;
+    (!s||h.status===s)?map.addLayer(markers[h.id]):map.removeLayer(markers[h.id]);
+  });
 }
 
 // ═══════════════════════════════════════
@@ -755,15 +618,20 @@ function renderList(){
   const q=(document.getElementById('search').value||'').toLowerCase();
   const f=houses.filter(h=>(!fStatus||h.status===fStatus)&&(!q||h.name.toLowerCase().includes(q)));
   const el=document.getElementById('hlist');
-  if(!f.length){el.innerHTML=houses.length===0?`<div class="empty-st"><span class="ei">🏠</span>Aucune maison.<br/>Appuyez sur <b>Ajouter</b> puis<br/>tapez sur la carte.</div>`:`<div class="empty-st">Aucune maison pour ce filtre.</div>`;return;}
+  if(!f.length){
+    el.innerHTML=houses.length===0
+      ?`<div class="empty-st"><span class="ei">🏠</span>Aucune maison.<br/>Appuyez sur <b>Ajouter</b> puis<br/>tapez sur la carte.</div>`
+      :`<div class="empty-st">Aucune maison pour ce filtre.</div>`;
+    return;
+  }
   el.innerHTML=f.map(h=>{
-    const g=groups.find(x=>x.id===h.group_id),s=ST[h.status]||ST['à_visiter'];
+    const g=groups.find(x=>x.id===h.group_id);
+    const s=ST[h.status]||ST['à_visiter'];
     return`<div class="hi${h.id===selId?' sel':''}" onclick="sel(${h.id});closeSheet('list')">
       <div class="hi-row">
         <div class="hi-dot" style="background:${s.color}"></div>
         <span class="hi-label">${h.name}</span>
         ${g?`<span class="hi-badge" style="background:${g.color}1a;color:${g.color}">${g.name}</span>`:''}
-        ${h.amount>0?`<span class="hi-amount">${h.amount} €</span>`:''}
       </div>
       <div class="hi-sub">${s.label}${h.note?` · ${h.note.slice(0,28)}…`:''}</div>
     </div>`;
@@ -775,30 +643,30 @@ function renderList(){
 // ═══════════════════════════════════════
 function renderGroups(){
   const el=document.getElementById('glist');
-  if(!groups.length){el.innerHTML=`<div class="empty-st"><span class="ei">📦</span>Aucun groupe.<br/>Créez-en un pour organiser<br/>vos tournées.</div>`;return;}
+  if(!groups.length){
+    el.innerHTML=`<div class="empty-st"><span class="ei">📦</span>Aucun groupe.<br/>Créez-en un pour organiser<br/>vos tournées.</div>`;
+    return;
+  }
   el.innerHTML=groups.map(g=>{
     const mems=houses.filter(h=>h.group_id===g.id);
     const v=mems.filter(h=>h.status==='visité').length;
     const pct=mems.length?Math.round(v/mems.length*100):0;
-    const total=mems.reduce((s,h)=>s+(h.amount||0),0);
     return`<div class="gcard">
       <div class="gheader">
         <div class="gcol" style="background:${g.color}"></div>
         <span class="gname">${g.name}</span>
         <span class="gcnt">${mems.length}</span>
-        ${total>0?`<span style="font-size:11px;color:var(--green);font-weight:600">${total} €</span>`:''}
-        ${userRole==='admin'?`<button class="gbtn" onclick="event.stopPropagation();delGroup('${g.id}')">✕</button>`:''}
+        <button class="gbtn" onclick="event.stopPropagation();delGroup('${g.id}')">✕</button>
       </div>
       ${mems.length?`
         <div class="gbar-wrap"><div class="gbar" style="width:${pct}%;background:${g.color}"></div></div>
-        <div class="gsub">${v}/${mems.length} visités${total>0?` · ${total} € collectés`:''}</div>
+        <div class="gsub">${v}/${mems.length} visités</div>
         <div class="gmems">${mems.map(h=>`
           <div class="gmem" onclick="sel(${h.id});closeSheet('groups')">
             <div class="gmdot" style="background:${ST[h.status]?.color||'#5b8af0'}"></div>
             <span class="gmname">${h.name}</span>
             <span style="font-size:11px;color:var(--muted)">${ST[h.status]?.label||''}</span>
-            ${h.amount>0?`<span style="font-size:11px;color:var(--green);font-weight:600">${h.amount} €</span>`:''}
-            ${userRole==='admin'?`<button class="gmrm" onclick="event.stopPropagation();rmFromGroup(${h.id})">✕</button>`:''}
+            <button class="gmrm" onclick="event.stopPropagation();rmFromGroup(${h.id})">✕</button>
           </div>`).join('')}
         </div>`:'<div class="gempty">Aucune maison assignée</div>'}
     </div>`;
@@ -806,12 +674,12 @@ function renderGroups(){
 }
 
 async function delGroup(gid){
-  if(userRole!=='admin'){showToast('Réservé à l\'admin');return;}
   if(!confirm('Supprimer ce groupe ?'))return;
   groups=groups.filter(x=>x.id!==gid);
   houses.forEach(h=>{if(h.group_id===gid){h.group_id=null;refreshM(h.id);}});
-  renderGroups();renderList();if(selId)openHouseSheet(selId);
-  await sb.from('groups').delete().eq('id',gid);
+  renderGroups();renderList();
+  if(selId)openHouseSheet(selId);
+  await sb.from('groups').delete().eq('id', gid);
 }
 async function rmFromGroup(hid){
   const h=houses.find(x=>x.id===hid);
@@ -822,159 +690,125 @@ async function rmFromGroup(hid){
 // ADD GROUP
 // ═══════════════════════════════════════
 function renderCPicker(){
-  document.getElementById('cpicker').innerHTML=GC.map(c=>`<div class="cp${c===selColor?' on':''}" style="background:${c}" onclick="pickC('${c}')"></div>`).join('');
+  document.getElementById('cpicker').innerHTML=GC.map(c=>
+    `<div class="cp${c===selColor?' on':''}" style="background:${c}" onclick="pickC('${c}')"></div>`).join('');
 }
 function pickC(c){selColor=c;renderCPicker();}
+function openAddGroup(){
+  document.getElementById('gName').value='';
+  selColor=GC[0];renderCPicker();
+  openSheet('addgroup');
+}
 async function confirmAddGroup(){
-  const name=document.getElementById('gName').value.trim();if(!name)return;
-  const g={id:'g'+Date.now(),edition_id:currentEditionId,name,color:selColor};
-  groups.push(g);closeSheet('addgroup');openSheet('groups');
+  const name=document.getElementById('gName').value.trim();
+  if(!name)return;
+  const g={id:'g'+Date.now(),name,color:selColor};
+  groups.push(g);
+  closeSheet('addgroup');
+  openSheet('groups');
   await sb.from('groups').insert(g);
 }
 
 // ═══════════════════════════════════════
-// ADMIN — RENDER
-// ═══════════════════════════════════════
-function renderAdmin(){
-  const total=houses.length;
-  const visited=houses.filter(h=>h.status==='visité').length;
-  const amount=houses.reduce((s,h)=>s+(h.amount||0),0);
-  document.getElementById('stat-total').textContent=total;
-  document.getElementById('stat-visited').textContent=visited;
-  document.getElementById('stat-amount').textContent=amount.toFixed(0)+' €';
-
-  const el=document.getElementById('edition-list');
-  el.innerHTML=editions.map(e=>`
-    <div class="edition-card${e.id===currentEditionId?' active':''}" onclick="switchEdition('${e.id}')">
-      <span class="edition-label">${e.label}</span>
-      <span class="edition-badge ${e.id===currentEditionId?'active':'inactive'}">${e.id===currentEditionId?'Active':'—'}</span>
-    </div>`).join('');
-}
-
-async function switchEdition(eid){
-  if(eid===currentEditionId)return;
-  // Désactiver toutes, activer la sélectionnée
-  await sb.from('editions').update({is_active:false}).neq('id','__none__');
-  await sb.from('editions').update({is_active:true}).eq('id',eid);
-  editions=editions.map(e=>({...e,is_active:e.id===eid}));
-  currentEditionId=eid;
-  // Recharger maisons & groupes pour cette édition
-  Object.values(markers).forEach(m=>map.removeLayer(m));markers={};
-  await loadEditionData(eid);
-  const ed=editions.find(e=>e.id===eid);
-  document.getElementById('editionLabel').textContent=`· ${ed?.label||eid}`;
-  renderAdmin();showToast(`✓ Édition ${ed?.label} activée`);
-  closeSheet('admin');
-}
-
-async function confirmAddEdition(){
-  if(userRole!=='admin'){showToast('Réservé à l\'admin');return;}
-  const year=parseInt(document.getElementById('eName').value);
-  const label=document.getElementById('eLabel').value.trim();
-  if(!year||!label)return;
-  const e={id:String(year),label,year,is_active:false};
-  editions.push(e);
-  await sb.from('editions').insert(e);
-  closeSheet('addedition');openSheet('admin');
-  showToast(`✓ Édition ${label} créée`);
-}
-
-// ═══════════════════════════════════════
-// EXPORT CSV
-// ═══════════════════════════════════════
-function exportCSV(){
-  const ed=editions.find(e=>e.id===currentEditionId);
-  const rows=[['Nom','Statut','Groupe','Montant (€)','Note','Latitude','Longitude']];
-  houses.forEach(h=>{
-    const g=groups.find(x=>x.id===h.group_id);
-    rows.push([h.name,ST[h.status]?.label||h.status,g?.name||'',h.amount||0,h.note||'',h.lat,h.lng]);
-  });
-  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download=`collecte_${ed?.id||'export'}.csv`;a.click();
-}
-
-// ═══════════════════════════════════════
-// DATABASE
+// DATABASE HELPERS
 // ═══════════════════════════════════════
 async function dbInsertHouse(h){
   setSyncState('loading');
-  const {error}=await sb.from('houses').insert({id:h.id,edition_id:h.edition_id,name:h.name,lat:h.lat,lng:h.lng,status:h.status,note:h.note,amount:h.amount||0,group_id:h.group_id});
-  setSyncState(error?'err':'ok');if(error)showToast('⚠️ Erreur sauvegarde');
+  const {error}=await sb.from('houses').insert({
+    id:h.id, name:h.name, lat:h.lat, lng:h.lng,
+    status:h.status, note:h.note, group_id:h.group_id
+  });
+  setSyncState(error?'err':'ok');
+  if(error) showToast('⚠️ Erreur de sauvegarde');
 }
+
 async function dbUpdateHouse(h){
   setSyncState('loading');
-  const {error}=await sb.from('houses').update({name:h.name,status:h.status,note:h.note,amount:h.amount||0,group_id:h.group_id,lat:h.lat,lng:h.lng}).eq('id',h.id);
-  setSyncState(error?'err':'ok');if(error)showToast('⚠️ Erreur mise à jour');
+  const {error}=await sb.from('houses').update({
+    name:h.name, status:h.status, note:h.note, group_id:h.group_id
+  }).eq('id',h.id);
+  setSyncState(error?'err':'ok');
+  if(error) showToast('⚠️ Erreur de mise à jour');
 }
 
 // ═══════════════════════════════════════
-// REALTIME
+// REALTIME — sync entre utilisateurs
 // ═══════════════════════════════════════
 function setupRealtime(){
   sb.channel('db-changes')
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'houses'},payload=>{
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'houses'}, payload=>{
       const h=payload.new;
-      if(h.edition_id!==currentEditionId)return;
-      if(!houses.find(x=>x.id===h.id)){houses.push(h);addM(h);renderList();renderGroups();updateFilter();showToast(`📍 ${h.name} ajoutée`);}
+      if(!houses.find(x=>x.id===h.id)){
+        houses.push(h); addM(h); renderList(); renderGroups(); updateFilter();
+        showToast(`📍 ${h.name} ajoutée`);
+      }
     })
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'houses'},payload=>{
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'houses'}, payload=>{
       const h=payload.new;
-      if(h.edition_id!==currentEditionId)return;
       const idx=houses.findIndex(x=>x.id===h.id);
-      if(idx>-1){houses[idx]={...houses[idx],...h};refreshM(h.id);renderList();renderGroups();updateFilter();if(selId===h.id)openHouseSheet(h.id);}
+      if(idx>-1){
+        houses[idx]={...houses[idx],...h};
+        refreshM(h.id); renderList(); renderGroups(); updateFilter();
+        if(selId===h.id) openHouseSheet(h.id);
+      }
     })
-    .on('postgres_changes',{event:'DELETE',schema:'public',table:'houses'},payload=>{
+    .on('postgres_changes',{event:'DELETE',schema:'public',table:'houses'}, payload=>{
       const id=payload.old.id;
-      if(houses.find(x=>x.id===id)){removeM(id);houses=houses.filter(x=>x.id!==id);if(selId===id){selId=null;closeSheet('house');}renderList();renderGroups();updateFilter();}
+      if(houses.find(x=>x.id===id)){
+        removeM(id); houses=houses.filter(x=>x.id!==id);
+        if(selId===id){selId=null;closeSheet('house');}
+        renderList(); renderGroups(); updateFilter();
+      }
     })
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'groups'},payload=>{
-      const g=payload.new;if(!groups.find(x=>x.id===g.id)&&g.edition_id===currentEditionId){groups.push(g);renderGroups();}
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'groups'}, payload=>{
+      const g=payload.new;
+      if(!groups.find(x=>x.id===g.id)){groups.push(g);renderGroups();}
     })
-    .on('postgres_changes',{event:'DELETE',schema:'public',table:'groups'},payload=>{
-      const id=payload.old.id;groups=groups.filter(x=>x.id!==id);
-      houses.forEach(h=>{if(h.group_id===id)h.group_id=null;});renderGroups();renderList();
+    .on('postgres_changes',{event:'DELETE',schema:'public',table:'groups'}, payload=>{
+      const id=payload.old.id;
+      groups=groups.filter(x=>x.id!==id);
+      houses.forEach(h=>{if(h.group_id===id)h.group_id=null;});
+      renderGroups(); renderList();
     })
     .subscribe();
 }
 
 // ═══════════════════════════════════════
-// LOAD EDITION DATA
-// ═══════════════════════════════════════
-async function loadEditionData(eid){
-  const {data:gData}=await sb.from('groups').select('*').eq('edition_id',eid).order('created_at');
-  groups=gData||[];
-  const {data:hData}=await sb.from('houses').select('*').eq('edition_id',eid).order('created_at');
-  houses=hData||[];
-  houses.forEach(h=>addM(h));
-  renderList();renderGroups();updateFilter();renderCPicker();
-}
-
-// ═══════════════════════════════════════
-// INIT
+// INIT — chargement depuis Supabase
 // ═══════════════════════════════════════
 async function init(){
-  setSyncState('loading');document.getElementById('tbCount').textContent='Chargement…';
+  setSyncState('loading');
+  document.getElementById('tbCount').textContent='Chargement…';
+
   try {
-    const {data:eData,error:eErr}=await sb.from('editions').select('*').order('year');
-    if(eErr)throw eErr;
-    editions=eData||[];
-    const active=editions.find(e=>e.is_active)||editions[0];
-    if(!active){
-      document.getElementById('tbCount').textContent='Aucune édition';
-      setSyncState('ok');return;
-    }
-    currentEditionId=active.id;
-    document.getElementById('editionLabel').textContent=`· ${active.label}`;
-    await loadEditionData(active.id);
-    setSyncState('ok');setupRealtime();
-  } catch(err){
-    console.error(err);setSyncState('err');
+    // Charger groupes en premier (les maisons y font référence)
+    const {data:gData, error:gErr} = await sb.from('groups').select('*').order('created_at');
+    if(gErr) throw gErr;
+    groups = gData || [];
+
+    // Charger maisons
+    const {data:hData, error:hErr} = await sb.from('houses').select('*').order('created_at');
+    if(hErr) throw hErr;
+    houses = hData || [];
+
+    // Placer les marqueurs sur la carte
+    houses.forEach(h => addM(h));
+
+    renderList(); renderGroups(); updateFilter(); renderCPicker();
+    setSyncState('ok');
+
+    // Activer la sync temps réel
+    setupRealtime();
+
+  } catch(err) {
+    console.error('Erreur init:', err);
+    setSyncState('err');
     document.getElementById('tbCount').textContent='Erreur connexion';
-    showToast('⚠️ Impossible de se connecter',4000);
+    showToast('⚠️ Impossible de se connecter à la base de données', 4000);
   }
 }
+
+init();
 </script>
 </body>
 </html>
