@@ -448,15 +448,30 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- bcryptjs for password hashing -->
-<script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+
+<script>
+// ── Vérification mot de passe via Web Crypto PBKDF2 (natif, sans dépendance) ──
+const PWD_SALT = 'village-collecte-2026';
+const PWD_ITER = 100000;
+const PWD_LEN  = 256;
+
+async function hashPassword(password) {
+  const enc    = new TextEncoder();
+  const keyMat = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+  const bits   = await crypto.subtle.deriveBits(
+    { name:'PBKDF2', salt:enc.encode(PWD_SALT), iterations:PWD_ITER, hash:'SHA-256' },
+    keyMat, PWD_LEN
+  );
+  return Array.from(new Uint8Array(bits)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+</script>
 
 <script>
 // ═══════════════════════════════════════
 // ⚙️  CONFIGURATION — À MODIFIER
 // ═══════════════════════════════════════
-const SUPABASE_URL = 'https://ljetbkjztjehrebhhbsc.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqZXRia2p6dGplaHJlYmhoYnNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNDI1NDUsImV4cCI6MjA5MzgxODU0NX0.Km-EodOaOIC8BjUJbkwsWfGPoazCzVSjzE1fbNOHsBk';
+const SUPABASE_URL = 'REMPLACE_PAR_TON_URL_SUPABASE';
+const SUPABASE_KEY = 'REMPLACE_PAR_TA_CLE_ANON_SUPABASE';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -494,7 +509,8 @@ async function doLogin(){
   try {
     const {data, error} = await sb.from('app_roles').select('pwd_hash').eq('role', loginTab).single();
     if(error||!data) throw new Error();
-    const ok = await bcrypt.compare(pwd, data.pwd_hash);
+    const pwdHash = await hashPassword(pwd);
+    const ok = pwdHash === data.pwd_hash;
     if(!ok){document.getElementById('loginErr').textContent='Mot de passe incorrect.';return;}
     userRole = loginTab;
     document.getElementById('loginOverlay').style.display='none';
