@@ -465,13 +465,14 @@ async function hashPassword(password) {
   );
   return Array.from(new Uint8Array(bits)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-</script>
 
-<script>
+// loginTab doit être déclaré ici (utilisé par les onclick HTML au-dessus)
+var loginTab = 'member';
+
 // ═══════════════════════════════════════
 // ⚙️  CONFIGURATION — À MODIFIER
 // ═══════════════════════════════════════
-const SUPABASE_URL = 'https://ljetbkjztjehrebhhbsc.supabase.co/rest/v1/';
+const SUPABASE_URL = 'https://ljetbkjztjehrebhhbsc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqZXRia2p6dGplaHJlYmhoYnNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNDI1NDUsImV4cCI6MjA5MzgxODU0NX0.Km-EodOaOIC8BjUJbkwsWfGPoazCzVSjzE1fbNOHsBk';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -494,7 +495,6 @@ let userRole = null; // 'admin' | 'member' | null
 // ═══════════════════════════════════════
 // LOGIN
 // ═══════════════════════════════════════
-let loginTab = 'member';
 function switchTab(t){
   loginTab = t;
   document.getElementById('tab-member').className = 'login-tab member'+(t==='member'?' on':'');
