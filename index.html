@@ -223,9 +223,10 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 
 /* ── LOGIN OVERLAY ── */
 .login-overlay{
-  position:fixed;inset:0;z-index:1000;background:var(--bg);
+  position:fixed;inset:0;z-index:2000;background:var(--bg);
   display:flex;align-items:center;justify-content:center;padding:24px;
 }
+.login-overlay *{position:relative;z-index:2001;}
 .login-box{
   width:100%;max-width:340px;background:var(--surface);
   border:1px solid var(--b2);border-radius:20px;padding:28px 24px;
@@ -470,7 +471,7 @@ async function hashPassword(password) {
 // ═══════════════════════════════════════
 // ⚙️  CONFIGURATION — À MODIFIER
 // ═══════════════════════════════════════
-const SUPABASE_URL = 'https://ljetbkjztjehrebhhbsc.supabase.co';
+const SUPABASE_URL = 'https://ljetbkjztjehrebhhbsc.supabase.co/rest/v1/';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqZXRia2p6dGplaHJlYmhoYnNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNDI1NDUsImV4cCI6MjA5MzgxODU0NX0.Km-EodOaOIC8BjUJbkwsWfGPoazCzVSjzE1fbNOHsBk';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -504,27 +505,49 @@ function switchTab(t){
 
 async function doLogin(){
   const pwd = document.getElementById('loginPwd').value;
-  if(!pwd){document.getElementById('loginErr').textContent='Entrez un mot de passe.';return;}
-  document.getElementById('loginErr').textContent='';
-  try {
-    const {data, error} = await sb.from('app_roles').select('pwd_hash').eq('role', loginTab).single();
-    if(error||!data) throw new Error();
-    const pwdHash = await hashPassword(pwd);
-    const ok = pwdHash === data.pwd_hash;
-    if(!ok){document.getElementById('loginErr').textContent='Mot de passe incorrect.';return;}
-    userRole = loginTab;
-    document.getElementById('loginOverlay').style.display='none';
-    document.getElementById('botnav').style.display='flex';
-    document.getElementById('tbPill').style.display='flex';
-    document.getElementById('roleBadge').style.display='flex';
-    const rb = document.getElementById('roleBadge');
-    rb.className = 'tb-pill '+(userRole==='admin'?'admin':'member');
-    document.getElementById('roleLabel').textContent = userRole==='admin'?'⚙️ Admin':'👤 Membre';
-    if(userRole==='admin') document.getElementById('bn-admin').style.display='flex';
-    await init();
-  } catch(e) {
-    document.getElementById('loginErr').textContent='Erreur de connexion.';
+  const errEl = document.getElementById('loginErr');
+  if(!pwd){errEl.textContent='Entrez un mot de passe.';return;}
+
+  // Vérif clés Supabase
+  if(SUPABASE_URL.includes('REMPLACE')){
+    errEl.textContent='Clés Supabase non configurées.';return;
   }
+  errEl.textContent='Vérification…';
+
+  // Récupérer hash depuis Supabase
+  let data, qError;
+  try {
+    const res = await sb.from('app_roles').select('pwd_hash').eq('role', loginTab).single();
+    data   = res.data;
+    qError = res.error;
+  } catch(e) {
+    errEl.textContent='Supabase injoignable : '+e.message;return;
+  }
+
+  if(qError || !data){
+    errEl.textContent='Rôle introuvable : '+(qError?.message||'réexécute schema.sql');return;
+  }
+
+  // Comparer hash
+  const pwdHash = await hashPassword(pwd);
+  console.log('hash saisi   :', pwdHash);
+  console.log('hash en base :', data.pwd_hash);
+  if(pwdHash !== data.pwd_hash){
+    errEl.textContent='Mot de passe incorrect.';return;
+  }
+
+  // Succès
+  errEl.textContent='';
+  userRole = loginTab;
+  document.getElementById('loginOverlay').style.display='none';
+  document.getElementById('botnav').style.display='flex';
+  document.getElementById('tbPill').style.display='flex';
+  document.getElementById('roleBadge').style.display='flex';
+  const rb = document.getElementById('roleBadge');
+  rb.className = 'tb-pill '+(userRole==='admin'?'admin':'member');
+  document.getElementById('roleLabel').textContent = userRole==='admin'?'️ Admin':'👤 Membre';
+  if(userRole==='admin') document.getElementById('bn-admin').style.display='flex';
+  await init();
 }
 
 function logout(){
