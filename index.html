@@ -204,12 +204,41 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 /* ── HINTS ── */
 .add-hint{
   position:fixed;top:64px;left:50%;transform:translateX(-50%);
-  background:var(--accent);color:#fff;padding:8px 20px;border-radius:20px;
-  font-size:13px;font-weight:600;z-index:700;box-shadow:0 4px 20px rgba(91,138,240,.5);
+  background:#8b5cf6;color:#fff;padding:8px 20px;border-radius:20px;
+  font-size:13px;font-weight:600;z-index:700;box-shadow:0 4px 20px rgba(139,92,246,.5);
   pointer-events:none;opacity:0;transition:opacity .2s;white-space:nowrap;
 }
 .add-hint.show{opacity:1}
-.move-hint{background:#8b5cf6}
+
+/* Add mode panel — affiché en bas au-dessus de la nav */
+.add-panel{
+  position:fixed;bottom:calc(var(--nav-h) + var(--safe-b) + 10px);
+  left:16px;right:16px;z-index:700;
+  background:rgba(17,17,22,.96);border:1px solid var(--accent);
+  border-radius:16px;padding:14px 16px;
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 4px 24px rgba(91,138,240,.3);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  transform:translateY(16px);opacity:0;pointer-events:none;
+  transition:all .25s cubic-bezier(.32,0,.2,1);
+}
+.add-panel.show{transform:translateY(0);opacity:1;pointer-events:auto}
+.add-panel-text{flex:1;font-size:13px;font-weight:500;color:var(--text);line-height:1.4}
+.add-panel-geo{
+  display:flex;align-items:center;gap:7px;
+  padding:9px 14px;border-radius:11px;
+  background:var(--accent);border:none;color:#fff;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;
+  box-shadow:0 2px 12px rgba(91,138,240,.4);
+}
+.add-panel-geo:active{opacity:.8}
+.add-panel-geo svg{stroke:#fff}
+
+/* ── CURSEUR POSITION EN DIRECT ── */
+.user-location-dot{
+  /* Cercle pulsant pour la position GPS en direct */
+}
 
 /* ── TOAST ── */
 .toast{
@@ -298,11 +327,43 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 <!-- MAP -->
 <div id="map"></div>
 
+<!-- GPS FAB — bouton flottant sur la carte -->
+<button id="gps-fab" onclick="toggleGps()" title="Activer le suivi GPS" style="
+  position:fixed;right:14px;bottom:calc(var(--nav-h) + var(--safe-b) + 60px);
+  z-index:450;
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(17,17,22,.92);
+  border:1px solid rgba(50,50,64,.9);
+  color:#8888aa;
+  display:none;
+  align-items:center;justify-content:center;
+  box-shadow:0 2px 12px rgba(0,0,0,.5);
+  cursor:pointer;
+  transition:all .2s;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+    <circle cx="12" cy="12" r="3"/>
+    <circle cx="12" cy="12" r="8"/>
+    <line x1="12" y1="2" x2="12" y2="4"/>
+    <line x1="12" y1="20" x2="12" y2="22"/>
+    <line x1="2" y1="12" x2="4" y2="12"/>
+    <line x1="20" y1="12" x2="22" y2="12"/>
+  </svg>
+</button>
+
 <!-- FILTER BAR -->
 <div class="filter-bar" id="filterBar"></div>
 
-<!-- ADD MODE HINT -->
-<div class="add-hint" id="addHint">📍 Tapez sur la carte pour placer</div>
+<!-- ADD MODE PANEL -->
+<div class="add-hint" id="addHint"></div>
+<div class="add-panel" id="addPanel">
+  <div class="add-panel-text">📍 Tapez sur la carte pour placer une maison</div>
+  <button class="add-panel-geo" onclick="geolocateAndPlace()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
+    Ma position
+  </button>
+</div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -323,10 +384,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
     </div>
     <span id="addLabel">Ajouter</span>
   </button>
-  <button class="bnitem" onclick="geolocate()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
-    Position
-  </button>
+
   <button class="bnitem" id="bn-admin" onclick="openSheet('admin')" style="display:none">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
     Admin
@@ -542,6 +600,7 @@ async function doLogin(){
   document.getElementById('loginOverlay').style.display='none';
   document.getElementById('botnav').style.display='flex';
   document.getElementById('tbPill').style.display='flex';
+  document.getElementById('gps-fab').style.display='flex';
   document.getElementById('roleBadge').style.display='flex';
   const rb = document.getElementById('roleBadge');
   rb.className = 'tb-pill '+(userRole==='admin'?'admin':'member');
@@ -558,6 +617,8 @@ function logout(){
   document.getElementById('botnav').style.display='none';
   document.getElementById('tbPill').style.display='none';
   document.getElementById('roleBadge').style.display='none';
+  document.getElementById('gps-fab').style.display='none';
+  if(gpsActive) stopGpsTracking();
   document.getElementById('loginPwd').value='';
   switchTab('member');
 }
@@ -600,19 +661,164 @@ function geolocate(){
   );
 }
 
+// Géolocalise ET place une maison directement à la position actuelle
+async function geolocateAndPlace(){
+  if(!navigator.geolocation){showToast('Géolocalisation non disponible');return;}
+  const btn=document.querySelector('.add-panel-geo');
+  btn.textContent='Localisation…';btn.disabled=true;
+  navigator.geolocation.getCurrentPosition(
+    async p=>{
+      const latlng={lat:p.coords.latitude,lng:p.coords.longitude};
+      map.setView([latlng.lat,latlng.lng],18,{animate:true});
+      // Créer la maison à cette position
+      const id=Date.now();
+      const h={id,edition_id:currentEditionId,name:`Maison ${houses.length+1}`,lat:latlng.lat,lng:latlng.lng,status:'à_visiter',note:'',amount:0,group_id:null};
+      houses.push(h);addM(h);flashM(id);
+      renderList();renderGroups();updateFilter();
+      await dbInsertHouse(h);
+      showToast('📍 Maison placée à ta position');
+      btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg> Ma position';
+      btn.disabled=false;
+    },
+    ()=>{ showToast('⚠️ Impossible de localiser');btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg> Ma position';btn.disabled=false; },
+    {enableHighAccuracy:true,timeout:8000}
+  );
+}
+
+// ═══════════════════════════════════════
+// GPS TRACKING — position en direct sur la carte
+// ═══════════════════════════════════════
+let gpsWatchId    = null;
+let gpsMarker     = null;
+let gpsCircle     = null;
+let gpsActive     = false;
+
+function buildGpsIcon() {
+  return L.divIcon({
+    html: `
+      <div style="position:relative;width:22px;height:22px;display:flex;align-items:center;justify-content:center">
+        <!-- Halo pulsant -->
+        <div style="
+          position:absolute;width:40px;height:40px;border-radius:50%;
+          background:rgba(91,138,240,.18);
+          animation:gpsPulse 2s ease-out infinite;
+        "></div>
+        <!-- Anneau extérieur -->
+        <div style="
+          position:absolute;width:22px;height:22px;border-radius:50%;
+          background:rgba(91,138,240,.25);
+          border:2px solid rgba(91,138,240,.6);
+        "></div>
+        <!-- Point central -->
+        <div style="
+          width:10px;height:10px;border-radius:50%;
+          background:#5b8af0;
+          border:2px solid #fff;
+          box-shadow:0 0 8px rgba(91,138,240,.8);
+          position:relative;z-index:1;
+        "></div>
+      </div>`,
+    className: '',
+    iconSize: [22, 22],
+    iconAnchor: [11, 11]
+  });
+}
+
+function startGpsTracking() {
+  if (!navigator.geolocation) { showToast('Géolocalisation non disponible'); return; }
+
+  // Injecter le CSS de l'animation si pas déjà fait
+  if (!document.getElementById('gps-style')) {
+    const s = document.createElement('style');
+    s.id = 'gps-style';
+    s.textContent = `
+      @keyframes gpsPulse {
+        0%   { transform:scale(0.6); opacity:.9 }
+        70%  { transform:scale(2.2); opacity:0  }
+        100% { transform:scale(0.6); opacity:0  }
+      }
+    `;
+    document.head.appendChild(s);
+  }
+
+  gpsWatchId = navigator.geolocation.watchPosition(
+    pos => {
+      const latlng = [pos.coords.latitude, pos.coords.longitude];
+      const acc    = pos.coords.accuracy;
+
+      if (!gpsMarker) {
+        // Première position — créer marqueur + cercle de précision
+        gpsCircle = L.circle(latlng, {
+          radius: acc,
+          color: '#5b8af0', fillColor: '#5b8af0',
+          fillOpacity: 0.07, weight: 1, opacity: 0.35,
+          interactive: false
+        }).addTo(map);
+
+        gpsMarker = L.marker(latlng, { icon: buildGpsIcon(), zIndexOffset: 1000, interactive: false }).addTo(map);
+        map.setView(latlng, 17, { animate: true });
+        showToast('📡 Suivi GPS activé');
+      } else {
+        // Mise à jour position
+        gpsMarker.setLatLng(latlng);
+        gpsCircle.setLatLng(latlng);
+        gpsCircle.setRadius(acc);
+      }
+    },
+    err => { showToast('⚠️ GPS : ' + err.message); stopGpsTracking(); },
+    { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
+  );
+
+  gpsActive = true;
+  updateGpsBtn();
+}
+
+function stopGpsTracking() {
+  if (gpsWatchId !== null) { navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null; }
+  if (gpsMarker)  { map.removeLayer(gpsMarker);  gpsMarker  = null; }
+  if (gpsCircle)  { map.removeLayer(gpsCircle);  gpsCircle  = null; }
+  gpsActive = false;
+  updateGpsBtn();
+  showToast('Suivi GPS désactivé');
+}
+
+function toggleGps() {
+  gpsActive ? stopGpsTracking() : startGpsTracking();
+}
+
+function updateGpsBtn() {
+  const btn = document.getElementById('gps-fab');
+  if (!btn) return;
+  if (gpsActive) {
+    btn.style.background    = '#5b8af0';
+    btn.style.boxShadow     = '0 0 0 3px rgba(91,138,240,.3), 0 4px 16px rgba(91,138,240,.5)';
+    btn.title = 'Désactiver le suivi GPS';
+  } else {
+    btn.style.background    = 'rgba(17,17,22,.92)';
+    btn.style.boxShadow     = '0 2px 12px rgba(0,0,0,.5)';
+    btn.title = 'Activer le suivi GPS';
+  }
+}
+
 // ═══════════════════════════════════════
 // ADD / MOVE MODES
 // ═══════════════════════════════════════
 function toggleAddMode(){
   addMode=!addMode;
-  const btn=document.getElementById('bn-add'),hint=document.getElementById('addHint');
+  const btn=document.getElementById('bn-add');
+  const panel=document.getElementById('addPanel');
   const mapEl=document.getElementById('map'),icon=document.getElementById('addIcon'),lbl=document.getElementById('addLabel');
   if(addMode){
-    btn.classList.add('on');hint.classList.add('show');hint.classList.remove('move-hint');mapEl.classList.add('add-mode');
+    btn.classList.add('on');
+    panel.classList.add('show');
+    mapEl.classList.add('add-mode');
     icon.innerHTML='<line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/>';
-    lbl.textContent='Quitter';closeSheet(activeSheet);
+    lbl.textContent='Quitter';
+    closeSheet(activeSheet);
   } else {
-    btn.classList.remove('on');hint.classList.remove('show');mapEl.classList.remove('add-mode');
+    btn.classList.remove('on');
+    panel.classList.remove('show');
+    mapEl.classList.remove('add-mode');
     icon.innerHTML='<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>';
     lbl.textContent='Ajouter';
   }
@@ -677,17 +883,49 @@ function closeSheet(name){
 // ═══════════════════════════════════════
 function gc(h){const g=groups.find(x=>x.id===h.group_id);return g?g.color:ST[h.status]?.color||'#5b8af0';}
 function mkIcon(h){
-  const s=h.id===selId,c=gc(h),sc=ST[h.status]?.color||'#5b8af0',sz=s?40:28;
+  const sel = h.id === selId;
+  const groupColor  = gc(h);                          // couleur du groupe (ou statut si pas de groupe)
+  const statusColor = ST[h.status]?.color || '#5b8af0'; // couleur du statut
+  const w = sel ? 36 : 26;
+  const h2 = sel ? 44 : 32;  // hauteur pin = w * 1.22 environ
+  const r = sel ? 10 : 7;    // border-radius du corps
+  const tailH = sel ? 10 : 7;
+  const bw = sel ? 3 : 2;
+
+  const html = `
+    <div style="position:relative;width:${w}px;height:${h2+tailH}px;filter:drop-shadow(0 3px 8px rgba(0,0,0,.7))${sel?` drop-shadow(0 0 8px ${groupColor}88)`:''};transition:all .15s">
+      <!-- Corps du pin -->
+      <div style="
+        width:${w}px;height:${h2}px;border-radius:${r}px ${r}px ${r*.6}px ${r*.6}px;
+        background:${statusColor};
+        border:${bw}px solid ${groupColor};
+        display:flex;align-items:center;justify-content:center;
+        position:relative;
+      ">
+        <!-- Pastille groupe au centre -->
+        <div style="
+          width:${w*.35}px;height:${w*.35}px;border-radius:50%;
+          background:${groupColor};
+          border:1.5px solid rgba(255,255,255,.5);
+          flex-shrink:0;
+        "></div>
+      </div>
+      <!-- Pointe du pin -->
+      <div style="
+        width:0;height:0;
+        border-left:${Math.round(w*.3)}px solid transparent;
+        border-right:${Math.round(w*.3)}px solid transparent;
+        border-top:${tailH}px solid ${groupColor};
+        margin:0 auto;
+      "></div>
+      ${sel ? `<div style="position:absolute;inset:-5px 0 ${tailH}px;border-radius:${r+3}px;border:1.5px solid rgba(255,255,255,.25);pointer-events:none"></div>` : ''}
+    </div>`;
+
   return L.divIcon({
-    html:`<div style="width:${sz}px;height:${sz}px;border-radius:50%;
-      background:${c}18;border:${s?3:2}px solid ${c};
-      display:flex;align-items:center;justify-content:center;
-      box-shadow:0 0 ${s?18:6}px ${c}66,0 2px 8px rgba(0,0,0,.7);
-      position:relative;transition:all .15s">
-      <div style="width:${sz*.38}px;height:${sz*.38}px;border-radius:50%;background:${sc}"></div>
-      ${s?`<div style="position:absolute;inset:-6px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3)"></div>`:''}
-    </div>`,
-    className:'',iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]
+    html,
+    className:'',
+    iconSize: [w, h2+tailH],
+    iconAnchor: [w/2, h2+tailH]   // pointe en bas
   });
 }
 function addM(h){
