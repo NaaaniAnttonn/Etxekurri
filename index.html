@@ -467,19 +467,11 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-// ── Vérification mot de passe via Web Crypto PBKDF2 (natif, sans dépendance) ──
-const PWD_SALT = 'etxekurri-2026';
-const PWD_ITER = 100000;
-const PWD_LEN  = 256;
-
+// ── Hash SHA-256 simple (natif, sans sel, sans dépendance) ──
 async function hashPassword(password) {
-  const enc    = new TextEncoder();
-  const keyMat = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
-  const bits   = await crypto.subtle.deriveBits(
-    { name:'PBKDF2', salt:enc.encode(PWD_SALT), iterations:PWD_ITER, hash:'SHA-256' },
-    keyMat, PWD_LEN
-  );
-  return Array.from(new Uint8Array(bits)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  const enc  = new TextEncoder();
+  const buf  = await crypto.subtle.digest('SHA-256', enc.encode(password));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
 // loginTab doit être déclaré ici (utilisé par les onclick HTML au-dessus)
