@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<title>Collecte — St Martin d'Arrossa</title>
+<title>Etxekurri — Collecte du village</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
@@ -224,16 +224,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 }
 .add-panel.show{transform:translateY(0);opacity:1;pointer-events:auto}
 .add-panel-text{flex:1;font-size:13px;font-weight:500;color:var(--text);line-height:1.4}
-.add-panel-geo{
-  display:flex;align-items:center;gap:7px;
-  padding:9px 14px;border-radius:11px;
-  background:var(--accent);border:none;color:#fff;
-  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
-  cursor:pointer;white-space:nowrap;flex-shrink:0;
-  box-shadow:0 2px 12px rgba(91,138,240,.4);
-}
-.add-panel-geo:active{opacity:.8}
-.add-panel-geo svg{stroke:#fff}
+
 
 /* ── CURSEUR POSITION EN DIRECT ── */
 .user-location-dot{
@@ -300,8 +291,8 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 <!-- LOGIN OVERLAY -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
-    <div class="login-title">🏡 Collecte Village</div>
-    <div class="login-sub">St-Martin-d'Arrossa · Comité des fêtes</div>
+    <div class="login-title">🏡 Etxekurri</div>
+    <div class="login-sub">Etxekurri · Comité des fêtes</div>
     <div class="login-tabs">
       <button class="login-tab member on" id="tab-member" onclick="switchTab('member')">Membre</button>
       <button class="login-tab admin" id="tab-admin" onclick="switchTab('admin')">Admin ⚙️</button>
@@ -314,7 +305,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 
 <!-- TOP BAR -->
 <div class="topbar">
-  <div class="tb-brand" id="tbBrand">St-Martin-d'Arrossa <span id="editionLabel">· Collecte</span></div>
+  <div class="tb-brand" id="tbBrand">Etxekurri <span id="editionLabel">· Collecte</span></div>
   <div id="tbPill" class="tb-pill" onclick="openSheet('admin')" style="display:none">
     <div class="sync-dot loading" id="syncDot"></div>
     <span id="tbCount">…</span>
@@ -359,10 +350,6 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 <div class="add-hint" id="addHint"></div>
 <div class="add-panel" id="addPanel">
   <div class="add-panel-text">📍 Tapez sur la carte pour placer une maison</div>
-  <button class="add-panel-geo" onclick="geolocateAndPlace()">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
-    Ma position
-  </button>
 </div>
 
 <!-- TOAST -->
@@ -457,37 +444,8 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
     <span>⚙️ Administration</span>
     <div class="sheet-close" onclick="closeSheet('admin')">✕</div>
   </div>
-  <div class="sheet-body">
-
-    <!-- Stats globales -->
-    <div class="admin-section">
-      <div class="admin-section-title">📊 Résumé de la collecte</div>
-      <div class="stat-row">
-        <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-lbl">Maisons</div></div>
-        <div class="stat-card green"><div class="stat-num" id="stat-visited">0</div><div class="stat-lbl">Visitées</div></div>
-        <div class="stat-card gold"><div class="stat-num" id="stat-amount">0 €</div><div class="stat-lbl">Collectés</div></div>
-      </div>
-    </div>
-
-    <!-- Éditions -->
-    <div class="admin-section">
-      <div class="admin-section-title">🗓 Éditions / Années</div>
-      <div id="edition-list"></div>
-      <button class="new-g-btn" onclick="openSheet('addedition')" style="margin-top:6px">＋ Nouvelle édition</button>
-    </div>
-
-    <!-- Export -->
-    <div class="admin-section">
-      <div class="admin-section-title">📋 Export</div>
-      <button class="sh-btn" onclick="exportCSV()" style="width:100%">⬇ Télécharger CSV</button>
-    </div>
-
-    <!-- Déplacer marqueurs -->
-    <div class="admin-section">
-      <div class="admin-section-title">📍 Carte</div>
-      <button class="sh-btn" onclick="closeSheet('admin');showToast('Ouvrez une maison puis appuyez sur Déplacer le marqueur');" style="width:100%">Mode déplacement des marqueurs</button>
-    </div>
-
+  <div class="sheet-body" id="admin-body">
+    <!-- Contenu injecté dynamiquement selon le rôle -->
   </div>
 </div>
 
@@ -510,7 +468,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 
 <script>
 // ── Vérification mot de passe via Web Crypto PBKDF2 (natif, sans dépendance) ──
-const PWD_SALT = 'village-collecte-2026';
+const PWD_SALT = 'etxekurri-2026';
 const PWD_ITER = 100000;
 const PWD_LEN  = 256;
 
@@ -543,7 +501,7 @@ const ST = {
   visité:   {label:'Visité',    color:'#22c55e'},
   absent:   {label:'Absent',    color:'#f59e0b'},
 };
-const GC = ['#5b8af0','#f472b6','#fb923c','#a78bfa','#34d399','#fbbf24','#60a5fa','#f87171','#e879f9','#4ade80'];
+const GC = ['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#a855f7','#ec4899'];
 
 let groups=[], houses=[], editions=[];
 let currentEditionId = null;
@@ -605,7 +563,10 @@ async function doLogin(){
   const rb = document.getElementById('roleBadge');
   rb.className = 'tb-pill '+(userRole==='admin'?'admin':'member');
   document.getElementById('roleLabel').textContent = userRole==='admin'?'️ Admin':'👤 Membre';
-  if(userRole==='admin') document.getElementById('bn-admin').style.display='flex';
+  // Bouton visible pour tout le monde : "Admin" ou "Résumé"
+  const bnAdmin = document.getElementById('bn-admin');
+  bnAdmin.style.display = 'flex';
+  bnAdmin.querySelector('span') && (bnAdmin.querySelector('span').textContent = userRole==='admin' ? 'Admin' : 'Résumé');
   await init();
 }
 
@@ -643,7 +604,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.p
 map.on('click', async e => {
   if(!addMode) return;
   const id=Date.now();
-  const h={id,edition_id:currentEditionId,name:`Maison ${houses.length+1}`,lat:e.latlng.lat,lng:e.latlng.lng,status:'à_visiter',note:'',amount:0,group_id:null};
+  const h={id,edition_id:currentEditionId,name:'',lat:e.latlng.lat,lng:e.latlng.lng,status:'à_visiter',note:'',amount:0,group_id:null};
   houses.push(h);addM(h);flashM(id);renderList();renderGroups();updateFilter();
   await dbInsertHouse(h);
 });
@@ -672,7 +633,7 @@ async function geolocateAndPlace(){
       map.setView([latlng.lat,latlng.lng],18,{animate:true});
       // Créer la maison à cette position
       const id=Date.now();
-      const h={id,edition_id:currentEditionId,name:`Maison ${houses.length+1}`,lat:latlng.lat,lng:latlng.lng,status:'à_visiter',note:'',amount:0,group_id:null};
+      const h={id,edition_id:currentEditionId,name:'',lat:latlng.lat,lng:latlng.lng,status:'à_visiter',note:'',amount:0,group_id:null};
       houses.push(h);addM(h);flashM(id);
       renderList();renderGroups();updateFilter();
       await dbInsertHouse(h);
@@ -688,116 +649,198 @@ async function geolocateAndPlace(){
 // ═══════════════════════════════════════
 // GPS TRACKING — position en direct sur la carte
 // ═══════════════════════════════════════
-let gpsWatchId    = null;
-let gpsMarker     = null;
-let gpsCircle     = null;
-let gpsActive     = false;
+// ═══════════════════════════════════════
+// GPS FLÈCHE ORIENTÉE + CURSEURS MULTI-USERS
+// ═══════════════════════════════════════
+let gpsWatchId      = null;
+let gpsOrientWatchId= null;
+let gpsMarker       = null;
+let gpsCircle       = null;
+let gpsActive       = false;
+let gpsHeading      = null;   // cap en degrés (0=Nord)
+let myUserId        = 'user_' + Math.random().toString(36).slice(2,8); // ID unique par session
+let peerMarkers     = {};     // {userId: L.marker} — curseurs des autres
 
-function buildGpsIcon() {
+// Injecter CSS animation une seule fois
+function injectGpsStyle(){
+  if(document.getElementById('gps-style')) return;
+  const s=document.createElement('style');s.id='gps-style';
+  s.textContent=`
+    @keyframes gpsPulse{0%{transform:scale(.6);opacity:.9}70%{transform:scale(2.4);opacity:0}100%{transform:scale(.6);opacity:0}}
+  `;
+  document.head.appendChild(s);
+}
+
+// Icône flèche SVG orientée selon le cap
+function buildArrowIcon(heading, color='#5b8af0', size=32){
+  const rot = heading !== null ? heading : 0;
+  const hasHeading = heading !== null;
   return L.divIcon({
-    html: `
-      <div style="position:relative;width:22px;height:22px;display:flex;align-items:center;justify-content:center">
-        <!-- Halo pulsant -->
-        <div style="
-          position:absolute;width:40px;height:40px;border-radius:50%;
-          background:rgba(91,138,240,.18);
-          animation:gpsPulse 2s ease-out infinite;
-        "></div>
-        <!-- Anneau extérieur -->
-        <div style="
-          position:absolute;width:22px;height:22px;border-radius:50%;
-          background:rgba(91,138,240,.25);
-          border:2px solid rgba(91,138,240,.6);
-        "></div>
-        <!-- Point central -->
-        <div style="
-          width:10px;height:10px;border-radius:50%;
-          background:#5b8af0;
-          border:2px solid #fff;
-          box-shadow:0 0 8px rgba(91,138,240,.8);
-          position:relative;z-index:1;
-        "></div>
-      </div>`,
-    className: '',
-    iconSize: [22, 22],
-    iconAnchor: [11, 11]
+    html:`<div style="width:${size}px;height:${size}px;position:relative;display:flex;align-items:center;justify-content:center">
+      ${hasHeading?'':
+        // Pas de cap : cercle pulsant
+        `<div style="position:absolute;width:${size*1.5}px;height:${size*1.5}px;border-radius:50%;
+          background:${color}22;animation:gpsPulse 2s ease-out infinite"></div>`
+      }
+      <!-- Cercle de précision -->
+      <div style="position:absolute;width:${size}px;height:${size}px;border-radius:50%;
+        background:${color}15;border:1.5px solid ${color}55"></div>
+      <!-- Flèche SVG orientée -->
+      <svg width="${size*.75}" height="${size*.75}" viewBox="0 0 24 24"
+        style="transform:rotate(${rot}deg);transition:transform .3s;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));flex-shrink:0"
+        fill="${color}" stroke="white" stroke-width="1.2">
+        <!-- Corps de la flèche -->
+        <path d="M12 3 L17 19 L12 15 L7 19 Z"/>
+      </svg>
+    </div>`,
+    className:'',iconSize:[size,size],iconAnchor:[size/2,size/2]
   });
 }
 
-function startGpsTracking() {
-  if (!navigator.geolocation) { showToast('Géolocalisation non disponible'); return; }
-
-  // Injecter le CSS de l'animation si pas déjà fait
-  if (!document.getElementById('gps-style')) {
-    const s = document.createElement('style');
-    s.id = 'gps-style';
-    s.textContent = `
-      @keyframes gpsPulse {
-        0%   { transform:scale(0.6); opacity:.9 }
-        70%  { transform:scale(2.2); opacity:0  }
-        100% { transform:scale(0.6); opacity:0  }
-      }
-    `;
-    document.head.appendChild(s);
-  }
-
-  gpsWatchId = navigator.geolocation.watchPosition(
-    pos => {
-      const latlng = [pos.coords.latitude, pos.coords.longitude];
-      const acc    = pos.coords.accuracy;
-
-      if (!gpsMarker) {
-        // Première position — créer marqueur + cercle de précision
-        gpsCircle = L.circle(latlng, {
-          radius: acc,
-          color: '#5b8af0', fillColor: '#5b8af0',
-          fillOpacity: 0.07, weight: 1, opacity: 0.35,
-          interactive: false
-        }).addTo(map);
-
-        gpsMarker = L.marker(latlng, { icon: buildGpsIcon(), zIndexOffset: 1000, interactive: false }).addTo(map);
-        map.setView(latlng, 17, { animate: true });
-        showToast('📡 Suivi GPS activé');
-      } else {
-        // Mise à jour position
-        gpsMarker.setLatLng(latlng);
-        gpsCircle.setLatLng(latlng);
-        gpsCircle.setRadius(acc);
-      }
-    },
-    err => { showToast('⚠️ GPS : ' + err.message); stopGpsTracking(); },
-    { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
-  );
-
-  gpsActive = true;
-  updateGpsBtn();
+// Icône pour les autres membres (flèche colorée avec initiale)
+function buildPeerIcon(userId, heading, color='#f97316'){
+  const initial = userId.slice(-2).toUpperCase();
+  const rot = heading !== null ? heading : 0;
+  return L.divIcon({
+    html:`<div style="width:36px;height:36px;position:relative;display:flex;align-items:center;justify-content:center">
+      <div style="position:absolute;width:36px;height:36px;border-radius:50%;
+        background:${color}20;border:1.5px solid ${color}66"></div>
+      <svg width="20" height="20" viewBox="0 0 24 24"
+        style="transform:rotate(${rot}deg);transition:transform .3s;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6));position:absolute"
+        fill="${color}" stroke="white" stroke-width="1.2">
+        <path d="M12 3 L17 19 L12 15 L7 19 Z"/>
+      </svg>
+      <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);
+        background:${color};color:#fff;font-size:9px;font-weight:700;font-family:'DM Sans',sans-serif;
+        padding:1px 5px;border-radius:6px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.4)">
+        ${initial}
+      </div>
+    </div>`,
+    className:'',iconSize:[36,44],iconAnchor:[18,18]
+  });
 }
 
-function stopGpsTracking() {
-  if (gpsWatchId !== null) { navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null; }
-  if (gpsMarker)  { map.removeLayer(gpsMarker);  gpsMarker  = null; }
-  if (gpsCircle)  { map.removeLayer(gpsCircle);  gpsCircle  = null; }
-  gpsActive = false;
-  updateGpsBtn();
+// Couleurs pour les pairs (on tourne dans GC)
+const PEER_COLORS = ['#f97316','#22c55e','#a855f7','#ec4899','#eab308','#ef4444'];
+function peerColor(userId){ let h=0;for(const c of userId)h=(h*31+c.charCodeAt(0))%PEER_COLORS.length;return PEER_COLORS[h]; }
+
+// ── Démarrer le suivi GPS ──
+function startGpsTracking(){
+  if(!navigator.geolocation){showToast('Géolocalisation non disponible');return;}
+  injectGpsStyle();
+
+  // 1. Position GPS
+  gpsWatchId = navigator.geolocation.watchPosition(pos=>{
+    const latlng=[pos.coords.latitude,pos.coords.longitude];
+    const acc=pos.coords.accuracy;
+
+    if(!gpsMarker){
+      gpsCircle=L.circle(latlng,{radius:acc,color:'#5b8af0',fillColor:'#5b8af0',
+        fillOpacity:.07,weight:1,opacity:.3,interactive:false}).addTo(map);
+      gpsMarker=L.marker(latlng,{icon:buildArrowIcon(gpsHeading),zIndexOffset:1000,interactive:false}).addTo(map);
+      map.setView(latlng,17,{animate:true});
+      showToast('📡 Suivi GPS activé');
+    } else {
+      gpsMarker.setLatLng(latlng);
+      gpsCircle.setLatLng(latlng);
+      gpsCircle.setRadius(acc);
+    }
+
+    // Publier position dans Supabase pour les autres membres
+    broadcastPosition(pos.coords.latitude, pos.coords.longitude, gpsHeading);
+
+  },{enableHighAccuracy:true,maximumAge:2000,timeout:10000});
+
+  // 2. Orientation (boussole téléphone)
+  if(window.DeviceOrientationEvent){
+    const handler = e=>{
+      // Sur iOS : e.webkitCompassHeading ; ailleurs : 360 - e.alpha
+      const h = (e.webkitCompassHeading != null)
+        ? e.webkitCompassHeading
+        : (e.alpha != null ? (360 - e.alpha) % 360 : null);
+      if(h===null) return;
+      gpsHeading = h;
+      if(gpsMarker) gpsMarker.setIcon(buildArrowIcon(h));
+    };
+    // iOS 13+ nécessite une permission
+    if(typeof DeviceOrientationEvent.requestPermission === 'function'){
+      DeviceOrientationEvent.requestPermission().then(r=>{
+        if(r==='granted') window.addEventListener('deviceorientation',handler,true);
+      }).catch(()=>{});
+    } else {
+      window.addEventListener('deviceorientation',handler,true);
+    }
+    gpsOrientWatchId = handler;
+  }
+
+  gpsActive=true; updateGpsBtn();
+  // Démarrer l'écoute des pairs
+  setupPeerTracking();
+}
+
+function stopGpsTracking(){
+  if(gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null;}
+  if(gpsOrientWatchId){window.removeEventListener('deviceorientation',gpsOrientWatchId,true);gpsOrientWatchId=null;}
+  if(gpsMarker){map.removeLayer(gpsMarker);gpsMarker=null;}
+  if(gpsCircle){map.removeLayer(gpsCircle);gpsCircle=null;}
+  gpsHeading=null; gpsActive=false; updateGpsBtn();
+  // Supprimer sa présence
+  sb.from('user_presence').delete().eq('user_id',myUserId).then(()=>{});
   showToast('Suivi GPS désactivé');
 }
 
-function toggleGps() {
-  gpsActive ? stopGpsTracking() : startGpsTracking();
+function toggleGps(){ gpsActive ? stopGpsTracking() : startGpsTracking(); }
+
+function updateGpsBtn(){
+  const btn=document.getElementById('gps-fab');if(!btn)return;
+  if(gpsActive){
+    btn.style.background='#5b8af0';
+    btn.style.boxShadow='0 0 0 3px rgba(91,138,240,.3),0 4px 16px rgba(91,138,240,.5)';
+    btn.querySelector('svg').style.stroke='#fff';
+  } else {
+    btn.style.background='rgba(17,17,22,.92)';
+    btn.style.boxShadow='0 2px 12px rgba(0,0,0,.5)';
+    btn.querySelector('svg').style.stroke='#8888aa';
+  }
 }
 
-function updateGpsBtn() {
-  const btn = document.getElementById('gps-fab');
-  if (!btn) return;
-  if (gpsActive) {
-    btn.style.background    = '#5b8af0';
-    btn.style.boxShadow     = '0 0 0 3px rgba(91,138,240,.3), 0 4px 16px rgba(91,138,240,.5)';
-    btn.title = 'Désactiver le suivi GPS';
-  } else {
-    btn.style.background    = 'rgba(17,17,22,.92)';
-    btn.style.boxShadow     = '0 2px 12px rgba(0,0,0,.5)';
-    btn.title = 'Activer le suivi GPS';
-  }
+// ── Présence temps réel ──
+let broadcastTimer=null;
+async function broadcastPosition(lat,lng,heading){
+  clearTimeout(broadcastTimer);
+  broadcastTimer=setTimeout(async()=>{
+    await sb.from('user_presence').upsert({
+      user_id: myUserId,
+      role: userRole||'member',
+      lat, lng,
+      heading: heading||0,
+      updated_at: new Date().toISOString()
+    },{onConflict:'user_id'});
+  },1500); // debounce 1.5s
+}
+
+let peerChannel=null;
+function setupPeerTracking(){
+  if(peerChannel) return;
+  peerChannel = sb.channel('presence-live')
+    .on('postgres_changes',{event:'*',schema:'public',table:'user_presence'},payload=>{
+      const row=payload.new||payload.old;
+      if(!row||row.user_id===myUserId) return;
+      if(payload.eventType==='DELETE'||payload.eventType==='delete'){
+        // Pair déconnecté
+        if(peerMarkers[row.user_id]){map.removeLayer(peerMarkers[row.user_id]);delete peerMarkers[row.user_id];}
+        return;
+      }
+      const color=peerColor(row.user_id);
+      const latlng=[row.lat,row.lng];
+      if(!peerMarkers[row.user_id]){
+        peerMarkers[row.user_id]=L.marker(latlng,{icon:buildPeerIcon(row.user_id,row.heading,color),zIndexOffset:900,interactive:false}).addTo(map);
+      } else {
+        peerMarkers[row.user_id].setLatLng(latlng);
+        peerMarkers[row.user_id].setIcon(buildPeerIcon(row.user_id,row.heading,color));
+      }
+    })
+    .subscribe();
 }
 
 // ═══════════════════════════════════════
@@ -867,7 +910,10 @@ function openSheet(name){
   document.getElementById('bn-groups').classList.toggle('on',name==='groups');
   if(name==='list')renderList();
   if(name==='groups')renderGroups();
-  if(name==='admin')renderAdmin();
+  if(name==='admin'){
+    document.getElementById('admin-sheet-title').textContent = userRole==='admin' ? '⚙️ Administration' : '📊 Résumé';
+    renderAdmin();
+  }
 }
 function closeSheet(name){
   if(!name)return;
@@ -1113,19 +1159,58 @@ async function confirmAddGroup(){
 // ADMIN — RENDER
 // ═══════════════════════════════════════
 function renderAdmin(){
-  const total=houses.length;
-  const visited=houses.filter(h=>h.status==='visité').length;
-  const amount=houses.reduce((s,h)=>s+(h.amount||0),0);
-  document.getElementById('stat-total').textContent=total;
-  document.getElementById('stat-visited').textContent=visited;
-  document.getElementById('stat-amount').textContent=amount.toFixed(0)+' €';
+  const total   = houses.length;
+  const visited = houses.filter(h=>h.status==='visité').length;
+  const absent  = houses.filter(h=>h.status==='absent').length;
+  const amount  = houses.reduce((s,h)=>s+(h.amount||0),0);
+  const pct     = total ? Math.round(visited/total*100) : 0;
 
-  const el=document.getElementById('edition-list');
-  el.innerHTML=editions.map(e=>`
-    <div class="edition-card${e.id===currentEditionId?' active':''}" onclick="switchEdition('${e.id}')">
-      <span class="edition-label">${e.label}</span>
-      <span class="edition-badge ${e.id===currentEditionId?'active':'inactive'}">${e.id===currentEditionId?'Active':'—'}</span>
-    </div>`).join('');
+  // Stats communes (admin + membre)
+  const statsHtml = `
+    <div class="admin-section">
+      <div class="admin-section-title">📊 Résumé de la collecte</div>
+      <div class="stat-row">
+        <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-lbl">Maisons</div></div>
+        <div class="stat-card green"><div class="stat-num">${visited}</div><div class="stat-lbl">Visitées</div></div>
+        <div class="stat-card gold"><div class="stat-num">${amount.toFixed(0)} €</div><div class="stat-lbl">Collectés</div></div>
+      </div>
+      <div style="margin-top:4px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px">
+          <span>Progression</span><span>${pct}%</span>
+        </div>
+        <div style="height:5px;background:var(--s3);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:var(--green);border-radius:3px;transition:width .4s"></div>
+        </div>
+      </div>
+      ${absent>0?`<div style="margin-top:8px;font-size:12px;color:var(--amber)">⚠ ${absent} absent${absent>1?'s':''}</div>`:''}
+    </div>`;
+
+  // Sections admin uniquement
+  const adminHtml = userRole==='admin' ? `
+    <div class="admin-section">
+      <div class="admin-section-title">🗓 Éditions / Années</div>
+      <div id="edition-list"></div>
+      <button class="new-g-btn" onclick="openSheet('addedition')" style="margin-top:6px">＋ Nouvelle édition</button>
+    </div>
+    <div class="admin-section">
+      <div class="admin-section-title">📋 Export</div>
+      <button class="sh-btn" onclick="exportCSV()" style="width:100%">⬇ Télécharger CSV</button>
+    </div>
+    <div class="admin-section">
+      <div class="admin-section-title">📍 Carte</div>
+      <button class="sh-btn" onclick="closeSheet('admin');showToast('Ouvrez une maison puis appuyez sur Déplacer le marqueur');" style="width:100%">Mode déplacement des marqueurs</button>
+    </div>` : '';
+
+  document.getElementById('admin-body').innerHTML = statsHtml + adminHtml;
+
+  // Remplir la liste des éditions (admin seulement)
+  if(userRole==='admin'){
+    document.getElementById('edition-list').innerHTML = editions.map(e=>`
+      <div class="edition-card${e.id===currentEditionId?' active':''}" onclick="switchEdition('${e.id}')">
+        <span class="edition-label">${e.label}</span>
+        <span class="edition-badge ${e.id===currentEditionId?'active':'inactive'}">${e.id===currentEditionId?'Active':'—'}</span>
+      </div>`).join('');
+  }
 }
 
 async function switchEdition(eid){
