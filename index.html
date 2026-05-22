@@ -1306,30 +1306,31 @@ async function dbUpdateHouse(h){
 // ═══════════════════════════════════════
 function setupRealtime(){
   try {
-  sb.channel('db-changes')
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'houses'},payload=>{
-      const h=payload.new;
-      if(h.edition_id!==currentEditionId)return;
-      if(!houses.find(x=>x.id===h.id)){houses.push(h);addM(h);renderList();renderGroups();updateFilter();showToast(`📍 ${h.name} ajoutée`);}
-    })
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'houses'},payload=>{
-      const h=payload.new;
-      if(h.edition_id!==currentEditionId)return;
-      const idx=houses.findIndex(x=>x.id===h.id);
-      if(idx>-1){houses[idx]={...houses[idx],...h};refreshM(h.id);renderList();renderGroups();updateFilter();if(selId===h.id)openHouseSheet(h.id);}
-    })
-    .on('postgres_changes',{event:'DELETE',schema:'public',table:'houses'},payload=>{
-      const id=payload.old.id;
-      if(houses.find(x=>x.id===id)){removeM(id);houses=houses.filter(x=>x.id!==id);if(selId===id){selId=null;closeSheet('house');}renderList();renderGroups();updateFilter();}
-    })
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'groups'},payload=>{
-      const g=payload.new;if(!groups.find(x=>x.id===g.id)&&g.edition_id===currentEditionId){groups.push(g);renderGroups();}
-    })
-    .on('postgres_changes',{event:'DELETE',schema:'public',table:'groups'},payload=>{
-      const id=payload.old.id;groups=groups.filter(x=>x.id!==id);
-      houses.forEach(h=>{if(h.group_id===id)h.group_id=null;});renderGroups();renderList();
-    })
-    .subscribe();
+    sb.channel('db-changes')
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'houses'},payload=>{
+        const h=payload.new;
+        if(h.edition_id!==currentEditionId)return;
+        if(!houses.find(x=>x.id===h.id)){houses.push(h);addM(h);renderList();renderGroups();updateFilter();showToast('📍 ajoutée');}
+      })
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'houses'},payload=>{
+        const h=payload.new;
+        if(h.edition_id!==currentEditionId)return;
+        const idx=houses.findIndex(x=>x.id===h.id);
+        if(idx>-1){houses[idx]={...houses[idx],...h};refreshM(h.id);renderList();renderGroups();updateFilter();if(selId===h.id)openHouseSheet(h.id);}
+      })
+      .on('postgres_changes',{event:'DELETE',schema:'public',table:'houses'},payload=>{
+        const id=payload.old.id;
+        if(houses.find(x=>x.id===id)){removeM(id);houses=houses.filter(x=>x.id!==id);if(selId===id){selId=null;closeSheet('house');}renderList();renderGroups();updateFilter();}
+      })
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'groups'},payload=>{
+        const g=payload.new;if(!groups.find(x=>x.id===g.id)&&g.edition_id===currentEditionId){groups.push(g);renderGroups();}
+      })
+      .on('postgres_changes',{event:'DELETE',schema:'public',table:'groups'},payload=>{
+        const id=payload.old.id;groups=groups.filter(x=>x.id!==id);
+        houses.forEach(h=>{if(h.group_id===id)h.group_id=null;});renderGroups();renderList();
+      })
+      .subscribe();
+  } catch(e){ console.warn('Realtime:', e.message); }
 }
 
 // ═══════════════════════════════════════
