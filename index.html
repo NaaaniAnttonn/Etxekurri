@@ -316,6 +316,8 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
     <input class="login-input" type="password" id="loginPwd" placeholder="Mot de passe…" onkeydown="if(event.key==='Enter')doLogin()"/>
     <button class="login-btn" onclick="doLogin()">Accéder</button>
     <div class="login-err" id="loginErr"></div>
+    <div id="debugHash" style="font-size:10px;color:#606080;margin-top:8px;word-break:break-all;display:none"></div>
+    <button onclick="showDebugHash()" style="margin-top:8px;background:transparent;border:none;color:#404060;font-size:11px;cursor:pointer;font-family:inherit">voir hash →</button>
   </div>
 </div>
 
@@ -477,6 +479,15 @@ async function hashPassword(password) {
 // loginTab doit être déclaré ici (utilisé par les onclick HTML au-dessus)
 var loginTab = 'member';
 
+// Debug : affiche le SHA-256 du mot de passe saisi
+async function showDebugHash(){
+  const pwd = document.getElementById('loginPwd').value;
+  if(!pwd){document.getElementById('debugHash').textContent='Saisis un mot de passe d'abord';document.getElementById('debugHash').style.display='block';return;}
+  const h = await hashPassword(pwd);
+  document.getElementById('debugHash').textContent = 'SHA-256 : '+h;
+  document.getElementById('debugHash').style.display='block';
+}
+
 // ═══════════════════════════════════════
 // ⚙️  CONFIGURATION — À MODIFIER
 // ═══════════════════════════════════════
@@ -549,17 +560,15 @@ async function doLogin(){
   userRole = loginTab;
   document.getElementById('loginOverlay').style.display='none';
   document.getElementById('botnav').style.display='flex';
-  document.getElementById('tbPill').style.display='flex';
+  document.getElementById('tbPill').style.display = userRole==='admin' ? 'flex' : 'none';
   document.getElementById('gps-fab').style.display='flex'; document.getElementById('gps-fab').style.alignItems='center'; document.getElementById('gps-fab').style.justifyContent='center';
   document.getElementById('roleBadge').style.display='flex';
   const rb = document.getElementById('roleBadge');
   rb.className = 'tb-pill '+(userRole==='admin'?'admin':'member');
   document.getElementById('roleLabel').textContent = userRole==='admin'?'Admin':'Membre';
-  // Bouton résumé pour membres, Admin pour admins
+  // Bouton Admin : visible uniquement pour les admins
   const bnAdmin = document.getElementById('bn-admin');
-  bnAdmin.style.display = 'flex';
-  const bnLabel = document.getElementById('bn-admin-label');
-  if(bnLabel) bnLabel.textContent = userRole==='admin' ? 'Admin' : 'Résumé';
+  bnAdmin.style.display = userRole==='admin' ? 'flex' : 'none';
   await init();
 }
 
