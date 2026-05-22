@@ -835,9 +835,9 @@ function updateGpsBtn(){
 }
 
 // ── Présence temps réel ──
-// ── GPS TEMPS RÉEL — upsert Supabase + polling léger ──
+// ── GPS TEMPS RÉEL — upsert + polling 3s ──
 let broadcastTimer = null;
-let peerChannel = null;
+let pollTimer = null;
 
 function broadcastPosition(lat, lng, heading){
   clearTimeout(broadcastTimer);
@@ -854,30 +854,48 @@ function broadcastPosition(lat, lng, heading){
   }, 800);
 }
 
-function setupPeerTracking(){
-  if(peerChannel) return;
-  peerChannel = sb.channel('peer-gps')
-    .on('postgres_changes',{event:'*',schema:'public',table:'user_presence'}, payload=>{
-      const row = payload.new || payload.old;
-      if(!row || row.user_id === myUserId) return;
-      if(payload.eventType === 'DELETE'){
-        if(peerMarkers[row.user_id]){ map.removeLayer(peerMarkers[row.user_id]); delete peerMarkers[row.user_id]; }
-        return;
+async function pollPeers(){
+  try {
+    const cutoff = new Date(Date.now() - 30000).toISOString(); // actifs dans les 30s
+    const {data} = await sb.from('user_presence')
+      .select('*')
+      .neq('user_id', myUserId)
+      .gte('updated_at', cutoff);
+    if(!data) return;
+
+    // Supprimer les marqueurs des pairs qui ne sont plus actifs
+    const activeIds = data.map(r => r.user_id);
+    Object.keys(peerMarkers).forEach(uid => {
+      if(!activeIds.includes(uid)){
+        map.removeLayer(peerMarkers[uid]); delete peerMarkers[uid];
       }
+    });
+
+    // Mettre à jour / créer les marqueurs
+    data.forEach(row => {
       const color = peerColor(row.user_id);
       const latlng = [row.lat, row.lng];
       if(!peerMarkers[row.user_id]){
-        peerMarkers[row.user_id] = L.marker(latlng,{icon:buildPeerIcon(row.user_id,row.heading,color),zIndexOffset:900,interactive:false}).addTo(map);
+        peerMarkers[row.user_id] = L.marker(latlng,{
+          icon: buildPeerIcon(row.user_id, row.heading, color),
+          zIndexOffset:900, interactive:false
+        }).addTo(map);
       } else {
         peerMarkers[row.user_id].setLatLng(latlng);
-        peerMarkers[row.user_id].setIcon(buildPeerIcon(row.user_id,row.heading,color));
+        peerMarkers[row.user_id].setIcon(buildPeerIcon(row.user_id, row.heading, color));
       }
-    })
-    .subscribe();
+    });
+  } catch(e){}
+}
+
+function setupPeerTracking(){
+  if(pollTimer) return;
+  pollPeers(); // immédiat
+  pollTimer = setInterval(pollPeers, 3000);
 }
 
 function stopPeerTracking(){
-  if(peerChannel){ sb.removeChannel(peerChannel); peerChannel=null; }
+  if(pollTimer){ clearInterval(pollTimer); pollTimer=null; }
   Object.values(peerMarkers).forEach(m=>map.removeLayer(m));
   peerMarkers={};
 }
