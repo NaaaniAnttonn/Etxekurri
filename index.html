@@ -466,7 +466,7 @@ function doLoginKey(e){if(e.key==='Enter')doLogin();}
 <div class="sheet" id="sheet-admin">
   <div class="sheet-handle"></div>
   <div class="sheet-title">
-    <span>⚙Administration</span>
+    <span id="admin-sheet-title">⚙ Administration</span>
     <div class="sheet-close" onclick="closeSheet('admin')">✕</div>
   </div>
   <div class="sheet-body" id="admin-body">
@@ -941,7 +941,7 @@ function openSheet(name){
   if(name==='list')renderList();
   if(name==='groups')renderGroups();
   if(name==='admin'){
-    document.getElementById('admin-sheet-title').textContent = userRole==='admin' ? '⚙Administration' : '📊 Résumé';
+    const ast=document.getElementById('admin-sheet-title'); if(ast) ast.textContent = userRole==='admin' ? '⚙ Administration' : '📊 Résumé';
     renderAdmin();
   }
 }
@@ -1305,6 +1305,7 @@ async function dbUpdateHouse(h){
 // REALTIME
 // ═══════════════════════════════════════
 function setupRealtime(){
+  try {
   sb.channel('db-changes')
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'houses'},payload=>{
       const h=payload.new;
