@@ -226,9 +226,25 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 .add-panel-text{flex:1;font-size:13px;font-weight:500;color:var(--text);line-height:1.4}
 
 
-/* ── CURSEUR POSITION EN DIRECT ── */
-.user-location-dot{
-  /* Cercle pulsant pour la position GPS en direct */
+/* ── BOUTON GPS FAB ── */
+.gps-fab-btn{
+  position:fixed;
+  right:14px;
+  bottom:calc(var(--nav-h) + var(--safe-b) + 14px);
+  z-index:450;
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(17,17,22,.92);
+  border:1px solid rgba(50,50,64,.9);
+  display:none;
+  align-items:center;justify-content:center;
+  box-shadow:0 2px 12px rgba(0,0,0,.5);
+  cursor:pointer;
+  transition:background .2s, box-shadow .2s;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+}
+.gps-fab-btn.active{
+  background:#5b8af0;
+  box-shadow:0 0 0 3px rgba(91,138,240,.3),0 4px 16px rgba(91,138,240,.5);
 }
 
 /* ── TOAST ── */
@@ -319,27 +335,11 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 <div id="map"></div>
 
 <!-- GPS FAB — bouton flottant sur la carte -->
-<button id="gps-fab" onclick="toggleGps()" title="Activer le suivi GPS" style="
-  position:fixed;right:14px;bottom:calc(var(--nav-h) + var(--safe-b) + 60px);
-  z-index:450;
-  width:44px;height:44px;border-radius:50%;
-  background:rgba(17,17,22,.92);
-  border:1px solid rgba(50,50,64,.9);
-  color:#8888aa;
-  display:none;
-  align-items:center;justify-content:center;
-  box-shadow:0 2px 12px rgba(0,0,0,.5);
-  cursor:pointer;
-  transition:all .2s;
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
-    <circle cx="12" cy="12" r="3"/>
-    <circle cx="12" cy="12" r="8"/>
-    <line x1="12" y1="2" x2="12" y2="4"/>
-    <line x1="12" y1="20" x2="12" y2="22"/>
-    <line x1="2" y1="12" x2="4" y2="12"/>
-    <line x1="20" y1="12" x2="22" y2="12"/>
+<button id="gps-fab" onclick="toggleGps()" title="Activer le suivi GPS" class="gps-fab-btn">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8888aa" stroke-width="2" id="gps-fab-icon">
+    <circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/>
+    <line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/>
+    <line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/>
   </svg>
 </button>
 
@@ -374,7 +374,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 
   <button class="bnitem" id="bn-admin" onclick="openSheet('admin')" style="display:none">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-    Admin
+    <span id="bn-admin-label">Résumé</span>
   </button>
 </nav>
 
@@ -441,7 +441,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 <div class="sheet" id="sheet-admin">
   <div class="sheet-handle"></div>
   <div class="sheet-title">
-    <span>⚙️ Administration</span>
+    <span>⚙Administration</span>
     <div class="sheet-close" onclick="closeSheet('admin')">✕</div>
   </div>
   <div class="sheet-body" id="admin-body">
@@ -550,15 +550,16 @@ async function doLogin(){
   document.getElementById('loginOverlay').style.display='none';
   document.getElementById('botnav').style.display='flex';
   document.getElementById('tbPill').style.display='flex';
-  document.getElementById('gps-fab').style.display='flex';
+  document.getElementById('gps-fab').style.display='flex'; document.getElementById('gps-fab').style.alignItems='center'; document.getElementById('gps-fab').style.justifyContent='center';
   document.getElementById('roleBadge').style.display='flex';
   const rb = document.getElementById('roleBadge');
   rb.className = 'tb-pill '+(userRole==='admin'?'admin':'member');
-  document.getElementById('roleLabel').textContent = userRole==='admin'?'️ Admin':'👤 Membre';
-  // Bouton visible pour tout le monde : "Admin" ou "Résumé"
+  document.getElementById('roleLabel').textContent = userRole==='admin'?'Admin':'Membre';
+  // Bouton résumé pour membres, Admin pour admins
   const bnAdmin = document.getElementById('bn-admin');
   bnAdmin.style.display = 'flex';
-  bnAdmin.querySelector('span') && (bnAdmin.querySelector('span').textContent = userRole==='admin' ? 'Admin' : 'Résumé');
+  const bnLabel = document.getElementById('bn-admin-label');
+  if(bnLabel) bnLabel.textContent = userRole==='admin' ? 'Admin' : 'Résumé';
   await init();
 }
 
@@ -785,14 +786,13 @@ function toggleGps(){ gpsActive ? stopGpsTracking() : startGpsTracking(); }
 
 function updateGpsBtn(){
   const btn=document.getElementById('gps-fab');if(!btn)return;
+  const icon=document.getElementById('gps-fab-icon');
   if(gpsActive){
-    btn.style.background='#5b8af0';
-    btn.style.boxShadow='0 0 0 3px rgba(91,138,240,.3),0 4px 16px rgba(91,138,240,.5)';
-    btn.querySelector('svg').style.stroke='#fff';
+    btn.classList.add('active');
+    if(icon) icon.setAttribute('stroke','#fff');
   } else {
-    btn.style.background='rgba(17,17,22,.92)';
-    btn.style.boxShadow='0 2px 12px rgba(0,0,0,.5)';
-    btn.querySelector('svg').style.stroke='#8888aa';
+    btn.classList.remove('active');
+    if(icon) icon.setAttribute('stroke','#8888aa');
   }
 }
 
@@ -903,7 +903,7 @@ function openSheet(name){
   if(name==='list')renderList();
   if(name==='groups')renderGroups();
   if(name==='admin'){
-    document.getElementById('admin-sheet-title').textContent = userRole==='admin' ? '⚙️ Administration' : '📊 Résumé';
+    document.getElementById('admin-sheet-title').textContent = userRole==='admin' ? '⚙Administration' : '📊 Résumé';
     renderAdmin();
   }
 }
