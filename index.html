@@ -302,6 +302,27 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 .leaflet-tooltip{background:rgba(17,17,22,.96)!important;border:1px solid var(--b2)!important;color:var(--text)!important;font-family:'DM Sans',sans-serif!important;font-size:12px!important;font-weight:500!important;border-radius:8px!important;padding:5px 12px!important;}
 .leaflet-tooltip-top::before{border-top-color:var(--b2)!important}
 </style>
+<script>
+// Déclaré dans <head> pour être dispo dès le rendu du HTML
+var loginTab = 'member';
+function switchTab(t){
+  loginTab=t;
+  var tm=document.getElementById('tab-member');
+  var ta=document.getElementById('tab-admin');
+  if(tm) tm.className='login-tab member'+(t==='member'?' on':'');
+  if(ta) ta.className='login-tab admin'+(t==='admin'?' on':'');
+  document.getElementById('loginPwd').value='';
+  document.getElementById('loginErr').textContent='';
+}
+var pwdVisible=false;
+function togglePwdVis(){
+  pwdVisible=!pwdVisible;
+  var inp=document.getElementById('loginPwd');
+  inp.type=pwdVisible?'text':'password';
+  document.getElementById('togglePwd').textContent=pwdVisible?'🙈':'👁';
+}
+function doLoginKey(e){if(e.key==='Enter')doLogin();}
+</script>
 </head>
 <body>
 
@@ -314,11 +335,12 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
       <button class="login-tab member on" id="tab-member" onclick="switchTab('member')">Membre</button>
       <button class="login-tab admin" id="tab-admin" onclick="switchTab('admin')">Admin ⚙️</button>
     </div>
-    <input class="login-input" type="password" id="loginPwd" placeholder="Mot de passe…" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <div style="position:relative">
+      <input class="login-input" type="password" id="loginPwd" placeholder="Mot de passe…" onkeydown="doLoginKey(event)" autocomplete="current-password"/>
+      <button type="button" id="togglePwd" onclick="togglePwdVis()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px;line-height:1">👁</button>
+    </div>
     <button class="login-btn" onclick="doLogin()">Accéder</button>
     <div class="login-err" id="loginErr"></div>
-    <div id="debugHash" style="font-size:10px;color:#606080;margin-top:8px;word-break:break-all;display:none"></div>
-    <button onclick="showDebugHash()" style="margin-top:8px;background:transparent;border:none;color:#404060;font-size:11px;cursor:pointer;font-family:inherit">voir hash →</button>
   </div>
 </div>
 
@@ -499,17 +521,7 @@ function hashPassword(password) {
   return Promise.resolve(sha256(password));
 }
 
-// loginTab doit être déclaré ici (utilisé par les onclick HTML au-dessus)
-var loginTab = 'member';
-
-// Debug : affiche le SHA-256 du mot de passe saisi
-async function showDebugHash(){
-  const pwd = document.getElementById('loginPwd').value;
-  if(!pwd){document.getElementById('debugHash').textContent='Saisis un mot de passe d'abord';document.getElementById('debugHash').style.display='block';return;}
-  const h = await hashPassword(pwd);
-  document.getElementById('debugHash').textContent = 'SHA-256 : '+h;
-  document.getElementById('debugHash').style.display='block';
-}
+// loginTab, switchTab, togglePwdVis déclarés dans <head>
 
 // ═══════════════════════════════════════
 // ⚙️  CONFIGURATION — À MODIFIER
@@ -537,13 +549,7 @@ let userRole = null; // 'admin' | 'member' | null
 // ═══════════════════════════════════════
 // LOGIN
 // ═══════════════════════════════════════
-function switchTab(t){
-  loginTab = t;
-  document.getElementById('tab-member').className = 'login-tab member'+(t==='member'?' on':'');
-  document.getElementById('tab-admin').className  = 'login-tab admin'+(t==='admin'?' on':'');
-  document.getElementById('loginPwd').value='';
-  document.getElementById('loginErr').textContent='';
-}
+// switchTab déclaré dans <head>
 
 async function doLogin(){
   const pwd = document.getElementById('loginPwd').value;
