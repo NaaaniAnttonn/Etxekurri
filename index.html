@@ -329,8 +329,8 @@ function doLoginKey(e){if(e.key==='Enter')doLogin();}
 <!-- LOGIN OVERLAY -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
-    <div class="login-title">🏡 Etxekurri</div>
-    <div class="login-sub">Etxekurri · Comité des fêtes</div>
+    <div class="login-title">Etxekurri</div>
+    <div class="login-sub">Arrosako Gazteriak</div>
     <div class="login-tabs">
       <button class="login-tab member on" id="tab-member" onclick="switchTab('member')">Membre</button>
       <button class="login-tab admin" id="tab-admin" onclick="switchTab('admin')">Admin ⚙️</button>
@@ -346,7 +346,7 @@ function doLoginKey(e){if(e.key==='Enter')doLogin();}
 
 <!-- TOP BAR -->
 <div class="topbar">
-  <div class="tb-brand" id="tbBrand">Etxekurri <span id="editionLabel">· Collecte</span></div>
+  <div class="tb-brand" id="tbBrand">Etxekurri</div>
   <div id="tbPill" class="tb-pill" onclick="openSheet('admin')" style="display:none">
     <div class="sync-dot loading" id="syncDot"></div>
     <span id="tbCount">…</span>
@@ -480,7 +480,7 @@ function doLoginKey(e){if(e.key==='Enter')doLogin();}
   <div class="sheet-title"><span>Nouvelle édition</span><div class="sheet-close" onclick="closeSheet('addedition')">✕</div></div>
   <div class="sheet-body">
     <div><div class="mlabel">Année</div><input class="minput" id="eName" type="number" placeholder="ex : 2027" min="2020" max="2099"/></div>
-    <div><div class="mlabel">Label</div><input class="minput" id="eLabel" placeholder="ex : Fête 2027"/></div>
+    <div><div class="mlabel">Label</div><input class="minput" id="eLabel" placeholder="ex : 2027"/></div>
     <div class="sh-actions">
       <button class="sh-btn sh-btn-accent" onclick="confirmAddEdition()">Créer</button>
       <button class="sh-btn" onclick="closeSheet('addedition')">Annuler</button>
@@ -816,7 +816,7 @@ function stopGpsTracking(){
   if(gpsCircle){map.removeLayer(gpsCircle);gpsCircle=null;}
   gpsHeading=null; gpsActive=false; updateGpsBtn();
   // Supprimer sa présence
-  sb.from('user_presence').delete().eq('user_id',myUserId).then(()=>{});
+  stopPeerTracking();
   showToast('Suivi GPS désactivé');
 }
 
@@ -835,42 +835,62 @@ function updateGpsBtn(){
 }
 
 // ── Présence temps réel ──
-let broadcastTimer=null;
-async function broadcastPosition(lat,lng,heading){
-  clearTimeout(broadcastTimer);
-  broadcastTimer=setTimeout(async()=>{
-    await sb.from('user_presence').upsert({
-      user_id: myUserId,
-      role: userRole||'member',
-      lat, lng,
-      heading: heading||0,
-      updated_at: new Date().toISOString()
-    },{onConflict:'user_id'});
-  },1500); // debounce 1.5s
+// ── GPS TEMPS RÉEL via Supabase Broadcast (instantané) ──
+let presenceChannel = null;
+
+function broadcastPosition(lat, lng, heading){
+  if(!presenceChannel) return;
+  presenceChannel.send({
+    type: 'broadcast',
+    event: 'position',
+    payload: { user_id: myUserId, role: userRole||'member', lat, lng, heading: heading||0 }
+  });
 }
 
-let peerChannel=null;
 function setupPeerTracking(){
-  if(peerChannel) return;
-  peerChannel = sb.channel('presence-live')
-    .on('postgres_changes',{event:'*',schema:'public',table:'user_presence'},payload=>{
-      const row=payload.new||payload.old;
-      if(!row||row.user_id===myUserId) return;
-      if(payload.eventType==='DELETE'||payload.eventType==='delete'){
-        // Pair déconnecté
-        if(peerMarkers[row.user_id]){map.removeLayer(peerMarkers[row.user_id]);delete peerMarkers[row.user_id];}
-        return;
-      }
-      const color=peerColor(row.user_id);
-      const latlng=[row.lat,row.lng];
-      if(!peerMarkers[row.user_id]){
-        peerMarkers[row.user_id]=L.marker(latlng,{icon:buildPeerIcon(row.user_id,row.heading,color),zIndexOffset:900,interactive:false}).addTo(map);
-      } else {
-        peerMarkers[row.user_id].setLatLng(latlng);
-        peerMarkers[row.user_id].setIcon(buildPeerIcon(row.user_id,row.heading,color));
-      }
-    })
-    .subscribe();
+  if(presenceChannel) return;
+
+  presenceChannel = sb.channel('gps-live', {
+    config: { broadcast: { self: false } }
+  });
+
+  // Recevoir les positions des autres
+  presenceChannel.on('broadcast', { event: 'position' }, ({ payload }) => {
+    if(!payload || payload.user_id === myUserId) return;
+    const color = peerColor(payload.user_id);
+    const latlng = [payload.lat, payload.lng];
+    if(!peerMarkers[payload.user_id]){
+      peerMarkers[payload.user_id] = L.marker(latlng, {
+        icon: buildPeerIcon(payload.user_id, payload.heading, color),
+        zIndexOffset: 900, interactive: false
+      }).addTo(map);
+    } else {
+      peerMarkers[payload.user_id].setLatLng(latlng);
+      peerMarkers[payload.user_id].setIcon(buildPeerIcon(payload.user_id, payload.heading, color));
+    }
+  });
+
+  // Détecter les déconnexions via Presence
+  presenceChannel.on('presence', { event: 'leave' }, ({ leftPresences }) => {
+    leftPresences.forEach(p => {
+      if(peerMarkers[p.user_id]){ map.removeLayer(peerMarkers[p.user_id]); delete peerMarkers[p.user_id]; }
+    });
+  });
+
+  presenceChannel.subscribe(async status => {
+    if(status === 'SUBSCRIBED'){
+      await presenceChannel.track({ user_id: myUserId, online: true });
+    }
+  });
+}
+
+function stopPeerTracking(){
+  if(presenceChannel){
+    presenceChannel.unsubscribe();
+    presenceChannel = null;
+  }
+  Object.values(peerMarkers).forEach(m => map.removeLayer(m));
+  peerMarkers = {};
 }
 
 // ═══════════════════════════════════════
@@ -1254,7 +1274,7 @@ async function switchEdition(eid){
   Object.values(markers).forEach(m=>map.removeLayer(m));markers={};
   await loadEditionData(eid);
   const ed=editions.find(e=>e.id===eid);
-  document.getElementById('editionLabel').textContent=`· ${ed?.label||eid}`;
+  
   renderAdmin();showToast(`✓ Édition ${ed?.label} activée`);
   closeSheet('admin');
 }
@@ -1360,7 +1380,7 @@ async function init(){
       setSyncState('ok');return;
     }
     currentEditionId=active.id;
-    document.getElementById('editionLabel').textContent=`· ${active.label}`;
+    
     await loadEditionData(active.id);
     setSyncState('ok');setupRealtime();
   } catch(err){
