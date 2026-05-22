@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<title>Etxekurri</title>
+<title>Etxekurri - Arrosako Gazteriak</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
@@ -311,7 +311,7 @@ function doLoginKey(e){if(e.key==='Enter')doLogin();}
 <!-- LOGIN OVERLAY -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
-    <div class="login-title">Etxekurri</div>
+    <div class="login-title">Etxekurri - Arrosako Gazteriak</div>
     <div class="login-sub">Arrosako Gazteriak</div>
     <div class="login-tabs">
       <button class="login-tab member on" id="tab-member" onclick="switchTab('member')">Membre</button>
@@ -328,7 +328,7 @@ function doLoginKey(e){if(e.key==='Enter')doLogin();}
 
 <!-- TOP BAR -->
 <div class="topbar">
-  <div class="tb-brand" id="tbBrand">Etxekurri</div>
+  <div class="tb-brand" id="tbBrand">Etxekurri - Arrosako Gazteriak</div>
   <div id="tbPill" class="tb-pill" onclick="openSheet('admin')" style="display:none">
     <div class="sync-dot loading" id="syncDot"></div>
     <span id="tbCount">…</span>
@@ -776,7 +776,8 @@ function startGpsTracking(){
     // Broadcast pour les autres
     broadcastPosition(pos.coords.latitude, pos.coords.longitude, gpsHeading);
 
-  },{enableHighAccuracy:true,maximumAge:3000,timeout:15000});
+  }, err=>{ showToast('⚠️ GPS : '+err.message); stopGpsTracking(); },
+  {enableHighAccuracy:true,maximumAge:3000,timeout:15000});
 
   // 2. Orientation (boussole téléphone)
   if(window.DeviceOrientationEvent){
