@@ -926,7 +926,6 @@ function toggleAddMode(){
 
 let movingId = null;
 function startMoveMode(){
-  if(userRole!=='admin'){showToast('Réservé à l\'admin');return;}
   movingId=selId;moveMode=true;
   closeSheet('house');
   const hint=document.getElementById('addHint');
@@ -1071,8 +1070,8 @@ function openHouseSheet(id){
   // Admin-only elements
   const delBtn=document.getElementById('sh-del-btn');
   const moveWrap=document.getElementById('sh-move-wrap');
-  if(userRole==='admin'){delBtn.style.display='';moveWrap.style.display='';}
-  else{delBtn.style.display='none';moveWrap.style.display='none';}
+  delBtn.style.display='';
+  moveWrap.style.display='';
 
   openSheet('house');
 }
@@ -1103,7 +1102,6 @@ function assignGroup(){
 }
 
 async function deleteSel(){
-  if(userRole!=='admin'){showToast('Réservé à l\'admin');return;}
   if(!selId||!confirm('Supprimer cette maison ?'))return;
   const id=selId;removeM(id);houses=houses.filter(x=>x.id!==id);
   selId=null;closeSheet('house');renderList();renderGroups();updateFilter();
