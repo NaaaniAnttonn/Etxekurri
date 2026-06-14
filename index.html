@@ -97,16 +97,13 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 
 /* ── FORMS ── */
 .sh-sec{font-size:10px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.sh-name-input,.minput,.grp-sel,.note-ta,.amount-input{
+.sh-name-input,.minput,.grp-sel,.note-ta{
   width:100%;padding:11px 14px;border-radius:12px;font-size:14px;
   background:var(--s2);border:1px solid var(--border);color:var(--text);
   font-family:'DM Sans',sans-serif;
 }
 .note-ta{resize:none;min-height:60px}
-.amount-input{padding-left:28px}
-.amount-wrap{position:relative}
-.amount-wrap::before{content:'€';position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
-.sh-name-input:focus,.minput:focus,.grp-sel:focus,.note-ta:focus,.amount-input:focus{outline:none;border-color:var(--accent)}
+.sh-name-input:focus,.minput:focus,.grp-sel:focus,.note-ta:focus:focus{outline:none;border-color:var(--accent)}
 .grp-sel{-webkit-appearance:none;appearance:none}
 
 .st-row{display:flex;gap:8px}
@@ -140,7 +137,6 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 .hi-label{font-size:14px;font-weight:500;flex:1}
 .hi-badge{font-size:11px;padding:2px 8px;border-radius:8px;font-weight:500}
 .hi-sub{font-size:11.5px;color:var(--muted);margin-top:3px;padding-left:17px}
-.hi-amount{font-size:11px;color:var(--green);font-weight:600}
 
 /* ── GROUPS ── */
 .gcard{border-radius:12px;border:1px solid var(--border);background:var(--s2);overflow:hidden;margin-bottom:6px}
@@ -407,10 +403,6 @@ function doLoginKey(e){if(e.key==='Enter')doLogin();}
     <div><div class="sh-sec">Nom</div><input class="sh-name-input" id="sh-name-edit" placeholder="Nom de la maison…"/></div>
     <div id="sh-meta" style="font-size:12px;color:var(--muted);margin-top:-4px"></div>
     <div><div class="sh-sec">Statut</div><div class="st-row" id="sh-status"></div></div>
-    <div>
-      <div class="sh-sec">Don reçu</div>
-      <div class="amount-wrap"><input class="amount-input" id="sh-amount" type="number" min="0" step="1" placeholder="0"/></div>
-    </div>
     <div><div class="sh-sec">Groupe</div><select class="grp-sel" id="sh-group" onchange="assignGroup()"></select></div>
     <div><div class="sh-sec">Note</div><textarea class="note-ta" id="sh-note" rows="2" placeholder="Ajouter une note…"></textarea></div>
     <div class="sh-actions">
@@ -631,7 +623,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.p
 map.on('click', async e => {
   if(!addMode) return;
   const id=Date.now();
-  const h={id,edition_id:currentEditionId,name:'',lat:e.latlng.lat,lng:e.latlng.lng,status:'à_visiter',note:'',amount:0,group_id:null};
+  const h={id,edition_id:currentEditionId,name:'',lat:e.latlng.lat,lng:e.latlng.lng,status:'à_visiter',note:'',group_id:null};
   houses.push(h);addM(h);flashM(id);renderList();renderGroups();updateFilter();
   await dbInsertHouse(h);
 });
@@ -660,7 +652,7 @@ async function geolocateAndPlace(){
       map.setView([latlng.lat,latlng.lng],18,{animate:true});
       // Créer la maison à cette position
       const id=Date.now();
-      const h={id,edition_id:currentEditionId,name:'',lat:latlng.lat,lng:latlng.lng,status:'à_visiter',note:'',amount:0,group_id:null};
+      const h={id,edition_id:currentEditionId,name:'',lat:latlng.lat,lng:latlng.lng,status:'à_visiter',note:'',group_id:null};
       houses.push(h);addM(h);flashM(id);
       renderList();renderGroups();updateFilter();
       await dbInsertHouse(h);
@@ -1057,7 +1049,6 @@ function openHouseSheet(id){
   document.getElementById('sh-name-edit').value=h.name;
   document.getElementById('sh-meta').textContent=g?`Groupe : ${g.name}`:'Aucun groupe';
   document.getElementById('sh-note').value=h.note||'';
-  document.getElementById('sh-amount').value=h.amount||0;
 
   document.getElementById('sh-status').innerHTML=Object.entries(ST).map(([k,cfg])=>`
     <button class="st-btn" style="border-color:${cfg.color};color:${h.status===k?'#09090e':cfg.color};background:${h.status===k?cfg.color:'transparent'}"
@@ -1086,7 +1077,6 @@ async function saveHouse(){
   const h=houses.find(x=>x.id===selId);if(!h)return;
   h.name=document.getElementById('sh-name-edit').value.trim()||h.name;
   h.note=document.getElementById('sh-note').value;
-  h.amount=parseFloat(document.getElementById('sh-amount').value)||0;
   h.group_id=document.getElementById('sh-group').value||null;
   document.getElementById('sh-name').textContent=h.name;
   refreshM(selId);renderList();renderGroups();
@@ -1141,7 +1131,6 @@ function renderList(){
         <div class="hi-dot" style="background:${s.color}"></div>
         <span class="hi-label">${h.name}</span>
         ${g?`<span class="hi-badge" style="background:${g.color}1a;color:${g.color}">${g.name}</span>`:''}
-        ${h.amount>0?`<span class="hi-amount">${h.amount} €</span>`:''}
       </div>
       <div class="hi-sub">${s.label}${h.note?` · ${h.note.slice(0,28)}…`:''}</div>
     </div>`;
@@ -1158,24 +1147,21 @@ function renderGroups(){
     const mems=houses.filter(h=>h.group_id===g.id);
     const v=mems.filter(h=>h.status==='visité').length;
     const pct=mems.length?Math.round(v/mems.length*100):0;
-    const total=mems.reduce((s,h)=>s+(h.amount||0),0);
     return`<div class="gcard">
       <div class="gheader">
         <div class="gcol" style="background:${g.color}"></div>
         <span class="gname">${g.name}</span>
         <span class="gcnt">${mems.length}</span>
-        ${total>0?`<span style="font-size:11px;color:var(--green);font-weight:600">${total} €</span>`:''}
         ${userRole==='admin'?`<button class="gbtn" onclick="event.stopPropagation();delGroup('${g.id}')">✕</button>`:''}
       </div>
       ${mems.length?`
         <div class="gbar-wrap"><div class="gbar" style="width:${pct}%;background:${g.color}"></div></div>
-        <div class="gsub">${v}/${mems.length} visités${total>0?` · ${total} € collectés`:''}</div>
+        <div class="gsub">${v}/${mems.length} visités</div>
         <div class="gmems">${mems.map(h=>`
           <div class="gmem" onclick="sel(${h.id});closeSheet('groups')">
             <div class="gmdot" style="background:${ST[h.status]?.color||'#5b8af0'}"></div>
             <span class="gmname">${h.name}</span>
             <span style="font-size:11px;color:var(--muted)">${ST[h.status]?.label||''}</span>
-            ${h.amount>0?`<span style="font-size:11px;color:var(--green);font-weight:600">${h.amount} €</span>`:''}
             ${userRole==='admin'?`<button class="gmrm" onclick="event.stopPropagation();rmFromGroup(${h.id})">✕</button>`:''}
           </div>`).join('')}
         </div>`:'<div class="gempty">Aucune maison assignée</div>'}
@@ -1217,7 +1203,6 @@ function renderAdmin(){
   const total   = houses.length;
   const visited = houses.filter(h=>h.status==='visité').length;
   const absent  = houses.filter(h=>h.status==='absent').length;
-  const amount  = houses.reduce((s,h)=>s+(h.amount||0),0);
   const pct     = total ? Math.round(visited/total*100) : 0;
 
   // Stats communes (admin + membre)
@@ -1227,7 +1212,6 @@ function renderAdmin(){
       <div class="stat-row">
         <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-lbl">Maisons</div></div>
         <div class="stat-card green"><div class="stat-num">${visited}</div><div class="stat-lbl">Visitées</div></div>
-        <div class="stat-card gold"><div class="stat-num">${amount.toFixed(0)} €</div><div class="stat-lbl">Collectés</div></div>
       </div>
       <div style="margin-top:4px">
         <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px">
@@ -1301,10 +1285,10 @@ async function confirmAddEdition(){
 // ═══════════════════════════════════════
 function exportCSV(){
   const ed=editions.find(e=>e.id===currentEditionId);
-  const rows=[['Nom','Statut','Groupe','Montant (€)','Note','Latitude','Longitude']];
+  const rows=[['Nom','Statut','Groupe','Note','Latitude','Longitude']];
   houses.forEach(h=>{
     const g=groups.find(x=>x.id===h.group_id);
-    rows.push([h.name,ST[h.status]?.label||h.status,g?.name||'',h.amount||0,h.note||'',h.lat,h.lng]);
+    rows.push([h.name,ST[h.status]?.label||h.status,g?.name||'',h.note||'',h.lat,h.lng]);
   });
   const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
@@ -1317,12 +1301,12 @@ function exportCSV(){
 // ═══════════════════════════════════════
 async function dbInsertHouse(h){
   setSyncState('loading');
-  const {error}=await sb.from('houses').insert({id:h.id,edition_id:h.edition_id,name:h.name,lat:h.lat,lng:h.lng,status:h.status,note:h.note,amount:h.amount||0,group_id:h.group_id});
+  const {error}=await sb.from('houses').insert({id:h.id,edition_id:h.edition_id,name:h.name,lat:h.lat,lng:h.lng,status:h.status,note:h.note,group_id:h.group_id});
   setSyncState(error?'err':'ok');if(error)showToast('⚠️ Erreur sauvegarde');
 }
 async function dbUpdateHouse(h){
   setSyncState('loading');
-  const {error}=await sb.from('houses').update({name:h.name,status:h.status,note:h.note,amount:h.amount||0,group_id:h.group_id,lat:h.lat,lng:h.lng}).eq('id',h.id);
+  const {error}=await sb.from('houses').update({name:h.name,status:h.status,note:h.note,group_id:h.group_id,lat:h.lat,lng:h.lng}).eq('id',h.id);
   setSyncState(error?'err':'ok');if(error)showToast('⚠️ Erreur mise à jour');
 }
 
