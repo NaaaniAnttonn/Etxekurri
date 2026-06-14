@@ -518,6 +518,7 @@ const SUPABASE_URL = 'https://ljetbkjztjehrebhhbsc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqZXRia2p6dGplaHJlYmhoYnNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNDI1NDUsImV4cCI6MjA5MzgxODU0NX0.Km-EodOaOIC8BjUJbkwsWfGPoazCzVSjzE1fbNOHsBk';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+window.addEventListener('load', checkSession);
 
 // ═══════════════════════════════════════
 // ÉTAT
@@ -572,9 +573,16 @@ async function doLogin(){
     errEl.textContent='Mot de passe incorrect.';return;
   }
 
-  // Succès
+  // Succès — sauvegarder la session 24h
   errEl.textContent='';
-  userRole = loginTab;
+  const expires = Date.now() + 24*60*60*1000;
+  try { localStorage.setItem('etx_session', JSON.stringify({role:loginTab, expires})); } catch(e){}
+  await applyRole(loginTab);
+}
+
+// Applique le rôle et affiche l'app
+async function applyRole(role){
+  userRole = role;
   document.getElementById('loginOverlay').style.display='none';
   document.getElementById('botnav').style.display='flex';
   document.getElementById('tbPill').style.display = userRole==='admin' ? 'flex' : 'none';
@@ -583,14 +591,28 @@ async function doLogin(){
   const rb = document.getElementById('roleBadge');
   rb.className = 'tb-pill '+(userRole==='admin'?'admin':'member');
   document.getElementById('roleLabel').textContent = userRole==='admin'?'Admin':'Membre';
-  // Bouton Admin : visible uniquement pour les admins
   const bnAdmin = document.getElementById('bn-admin');
   bnAdmin.style.display = userRole==='admin' ? 'flex' : 'none';
   await init();
 }
 
+// Vérifie une session existante au démarrage
+async function checkSession(){
+  try {
+    const raw = localStorage.getItem('etx_session');
+    if(!raw) return;
+    const s = JSON.parse(raw);
+    if(s.expires && Date.now() < s.expires && (s.role==='admin'||s.role==='member')){
+      await applyRole(s.role);
+    } else {
+      localStorage.removeItem('etx_session');
+    }
+  } catch(e){}
+}
+
 function logout(){
   if(!confirm('Se déconnecter ?')) return;
+  try { localStorage.removeItem('etx_session'); } catch(e){}
   userRole=null; selId=null; houses=[]; groups=[]; editions=[]; currentEditionId=null;
   Object.values(markers).forEach(m=>map.removeLayer(m)); markers={};
   document.getElementById('loginOverlay').style.display='flex';
